@@ -1,0 +1,136 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Lead {
+  id                 Int            @id @default(autoincrement())
+  name               String
+  email              String         @unique
+  phone              String?
+  company            String?
+  projectDescription String
+  estimatedBudgetMin Decimal?       @db.Decimal(10, 2)
+  estimatedBudgetMax Decimal?       @db.Decimal(10, 2)
+  estimatedTimeline  String?
+  status             LeadStatus     @default(NEW)
+  source             String         @default("website")
+  ipAddress          String?
+  userAgent          String?
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  bookings           Booking[]
+  conversations      Conversation[]
+  project            Project?
+
+  @@index([email])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model Conversation {
+  id         Int      @id @default(autoincrement())
+  leadId     Int
+  messages   Json
+  aiModel    String   @default("claude-sonnet-4")
+  tokenCount Int?
+  cost       Decimal? @db.Decimal(10, 4)
+  createdAt  DateTime @default(now())
+  lead       Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  @@index([leadId])
+  @@index([createdAt])
+}
+
+model Booking {
+  id              Int           @id @default(autoincrement())
+  leadId          Int
+  scheduledTime   DateTime
+  durationMinutes Int           @default(30)
+  meetingType     String
+  status          BookingStatus @default(SCHEDULED)
+  meetingUrl      String?
+  notes           String?
+  reminderSent    Boolean       @default(false)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  lead            Lead          @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  @@index([leadId])
+  @@index([scheduledTime])
+  @@index([status])
+}
+
+model Project {
+  id             Int           @id @default(autoincrement())
+  leadId         Int           @unique
+  projectName    String
+  actualBudget   Decimal?      @db.Decimal(10, 2)
+  actualTimeline String?
+  techStack      Json?
+  status         ProjectStatus @default(IN_PROGRESS)
+  startDate      DateTime?
+  endDate        DateTime?
+  completedAt    DateTime?
+  githubRepo     String?
+  liveUrl        String?
+  notes          String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  lead           Lead          @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([startDate])
+}
+
+model Quote {
+  id          Int       @id @default(autoincrement())
+  leadId      Int
+  projectType String
+  features    Json
+  minBudget   Decimal   @db.Decimal(10, 2)
+  maxBudget   Decimal   @db.Decimal(10, 2)
+  timeline    String
+  validUntil  DateTime
+  acceptedAt  DateTime?
+  rejectedAt  DateTime?
+  notes       String?
+  createdAt   DateTime  @default(now())
+
+  @@index([leadId])
+  @@index([validUntil])
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUOTED
+  CONSULTATION_BOOKED
+  PROPOSAL_SENT
+  NEGOTIATING
+  WON
+  LOST
+  INACTIVE
+}
+
+enum BookingStatus {
+  SCHEDULED
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+  RESCHEDULED
+}
+
+enum ProjectStatus {
+  IN_PROGRESS
+  ON_HOLD
+  COMPLETED
+  CANCELLED
+  MAINTENANCE
+}
