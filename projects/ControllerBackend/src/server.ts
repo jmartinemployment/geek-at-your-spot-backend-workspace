@@ -12,6 +12,8 @@ app.use(express.json());
 
 const WEB_DEV_BACKEND_URL = process.env.WEB_DEV_BACKEND_URL || 'http://localhost:3000';
 const ANALYTICS_BACKEND_URL = process.env.ANALYTICS_BACKEND_URL || 'http://localhost:5001';
+const MARKETING_BACKEND_URL = process.env.MARKETING_BACKEND_URL || 'http://localhost:5002';
+const WEBSITE_ANALYTICS_BACKEND_URL = process.env.WEBSITE_ANALYTICS_BACKEND_URL || 'http://localhost:5003';
 
 app.get('/', (req, res) => {
   res.json({
@@ -19,7 +21,9 @@ app.get('/', (req, res) => {
     version: '1.0.0',
     services: {
       webDevelopment: WEB_DEV_BACKEND_URL,
-      analytics: ANALYTICS_BACKEND_URL
+      businessAnalytics: ANALYTICS_BACKEND_URL,
+      marketing: MARKETING_BACKEND_URL,
+      websiteAnalytics: WEBSITE_ANALYTICS_BACKEND_URL
     }
   });
 });
@@ -35,19 +39,14 @@ app.get('/health', (req, res) => {
 app.use('/api/web-dev', async (req, res) => {
   try {
     const url = `${WEB_DEV_BACKEND_URL}${req.path}`;
-    
     const response = await fetch(url, {
       method: req.method,
       headers: { 'Content-Type': 'application/json' },
-      body: ['POST', 'PUT', 'PATCH'].includes(req.method) 
-        ? JSON.stringify(req.body) 
-        : undefined
+      body: ['POST', 'PUT', 'PATCH'].includes(req.method) ? JSON.stringify(req.body) : undefined
     });
-
     const data = await response.json();
     res.status(response.status).json(data);
   } catch (error) {
-    console.error('Web Dev proxy error:', error);
     res.status(500).json({ error: 'Failed to proxy request' });
   }
 });
@@ -55,23 +54,49 @@ app.use('/api/web-dev', async (req, res) => {
 // Proxy to AIBusinessAnalyticsBackend
 app.use('/api/ai-analytics', async (req, res) => {
   try {
-    // Replace /api/ai-analytics with /api/analytics for backend
     const path = req.path.replace(/^\//, '/api/analytics/');
     const url = `${ANALYTICS_BACKEND_URL}${path}`;
-    
     const response = await fetch(url, {
       method: req.method,
       headers: { 'Content-Type': 'application/json' },
-      body: ['POST', 'PUT', 'PATCH'].includes(req.method) 
-        ? JSON.stringify(req.body) 
-        : undefined
+      body: ['POST', 'PUT', 'PATCH'].includes(req.method) ? JSON.stringify(req.body) : undefined
     });
-
     const data = await response.json();
     res.status(response.status).json(data);
   } catch (error) {
-    console.error('Analytics proxy error:', error);
     res.status(500).json({ error: 'Failed to proxy analytics request' });
+  }
+});
+
+// Proxy to MarketingBackend
+app.use('/api/marketing', async (req, res) => {
+  try {
+    const url = `${MARKETING_BACKEND_URL}/api/marketing${req.path}`;
+    const response = await fetch(url, {
+      method: req.method,
+      headers: { 'Content-Type': 'application/json' },
+      body: ['POST', 'PUT', 'PATCH'].includes(req.method) ? JSON.stringify(req.body) : undefined
+    });
+    const data = await response.json();
+    res.status(response.status).json(data);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to proxy marketing request' });
+  }
+});
+
+// Proxy to WebsiteAnalyticsBackend
+app.use('/api/website-analytics', async (req, res) => {
+  try {
+    const url = `${WEBSITE_ANALYTICS_BACKEND_URL}/api/analytics${req.path}`;
+    const response = await fetch(url, {
+      method: req.method,
+      headers: { 'Content-Type': 'application/json' },
+      body: ['POST', 'PUT', 'PATCH'].includes(req.method) ? JSON.stringify(req.body) : undefined
+    });
+    const data = await response.json();
+    res.status(response.status).json(data);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to proxy website analytics request' });
   }
 });
 
@@ -81,6 +106,8 @@ app.listen(port, () => {
   console.log(`===========================================`);
   console.log(`📡 Health: http://localhost:${port}/health`);
   console.log(`🔀 Web Dev: http://localhost:${port}/api/web-dev`);
-  console.log(`📊 Analytics: http://localhost:${port}/api/ai-analytics`);
+  console.log(`📊 Business Analytics: http://localhost:${port}/api/ai-analytics`);
+  console.log(`📣 Marketing: http://localhost:${port}/api/marketing`);
+  console.log(`📈 Website Analytics: http://localhost:${port}/api/website-analytics`);
   console.log(`===========================================\n`);
 });
