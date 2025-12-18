@@ -51,11 +51,15 @@ app.use('/api/web-dev', async (req, res) => {
   }
 });
 
-// Proxy to AIBusinessAnalyticsBackend
+// Proxy to AIBusinessAnalyticsBackend  
 app.use('/api/ai-analytics', async (req, res) => {
   try {
-    const path = req.path.replace(/^\//, '/api/analytics/');
-    const url = `${ANALYTICS_BACKEND_URL}${path}`;
+    // For /health, send to /health. For /revenue, send to /api/analytics/revenue
+    let targetPath = req.path;
+    if (req.path !== '/health' && !req.path.startsWith('/api/')) {
+      targetPath = `/api/analytics${req.path}`;
+    }
+    const url = `${ANALYTICS_BACKEND_URL}${targetPath}`;
     const response = await fetch(url, {
       method: req.method,
       headers: { 'Content-Type': 'application/json' },
@@ -71,7 +75,11 @@ app.use('/api/ai-analytics', async (req, res) => {
 // Proxy to MarketingBackend
 app.use('/api/marketing', async (req, res) => {
   try {
-    const url = `${MARKETING_BACKEND_URL}/api/marketing${req.path}`;
+    let targetPath = req.path;
+    if (req.path !== '/health' && !req.path.startsWith('/api/')) {
+      targetPath = `/api/marketing${req.path}`;
+    }
+    const url = `${MARKETING_BACKEND_URL}${targetPath}`;
     const response = await fetch(url, {
       method: req.method,
       headers: { 'Content-Type': 'application/json' },
@@ -87,7 +95,11 @@ app.use('/api/marketing', async (req, res) => {
 // Proxy to WebsiteAnalyticsBackend
 app.use('/api/website-analytics', async (req, res) => {
   try {
-    const url = `${WEBSITE_ANALYTICS_BACKEND_URL}/api/analytics${req.path}`;
+    let targetPath = req.path;
+    if (req.path !== '/health' && !req.path.startsWith('/api/')) {
+      targetPath = `/api/analytics${req.path}`;
+    }
+    const url = `${WEBSITE_ANALYTICS_BACKEND_URL}${targetPath}`;
     const response = await fetch(url, {
       method: req.method,
       headers: { 'Content-Type': 'application/json' },
