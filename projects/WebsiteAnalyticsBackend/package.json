@@ -1,0 +1,23 @@
+{
+  "name": "website-analytics-backend",
+  "version": "1.0.0",
+  "description": "AI-powered website traffic analysis and conversion optimization",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "nodemon --exec ts-node src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js"
+  },
+  "dependencies": {
+    "express": "^5.0.1",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "@anthropic-ai/sdk": "^0.71.2",
+    "typescript": "^5.3.3",
+    "ts-node": "^10.9.2",
+    "nodemon": "^3.1.11",
+    "@types/express": "^5.0.0",
+    "@types/cors": "^2.8.19",
+    "@types/node": "^20.19.27"
+  }
+}
