@@ -1,4 +1,4 @@
-import Anthropic from '@anthropic-ai/sdk';
+import { AnthropicHelper } from '@geekquote/shared';
 
 export interface AnalyticsQuery {
   type: 'revenue' | 'customer' | 'growth' | 'forecast' | 'custom';
@@ -15,27 +15,28 @@ export interface AnalyticsResult {
 }
 
 export class AnalyticsService {
-  private anthropic: Anthropic;
+  private anthropic: AnthropicHelper;
 
   constructor(apiKey: string) {
-    this.anthropic = new Anthropic({ apiKey });
+    this.anthropic = new AnthropicHelper({ apiKey });
   }
 
   async analyzeData(query: AnalyticsQuery): Promise<AnalyticsResult> {
     const prompt = this.buildPrompt(query);
+    const response = await this.anthropic.sendMessage(prompt);
+    
+    const parsed = this.anthropic.parseJSON<AnalyticsResult>(response);
+    
+    if (parsed) {
+      return parsed;
+    }
 
-    const response = await this.anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 2000,
-      messages: [
-        {
-          role: 'user',
-          content: prompt
-        }
-      ]
-    });
-
-    return this.parseResponse(response);
+    // Fallback
+    return {
+      summary: response.substring(0, 200),
+      insights: ['Analysis completed - see summary for details'],
+      recommendations: ['Review the analysis and apply insights to your business']
+    };
   }
 
   private buildPrompt(query: AnalyticsQuery): string {
@@ -59,25 +60,5 @@ Metrics: ${query.metrics?.join(', ') || 'General analysis'}
 Format your response as JSON with keys: summary, insights (array), recommendations (array)`;
 
     return prompt;
-  }
-
-  private parseResponse(response: any): AnalyticsResult {
-    const text = response.content[0].text;
-    
-    try {
-      // Try to extract JSON from response
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        return JSON.parse(jsonMatch[0]);
-      }
-    } catch (e) {
-      // Fallback if JSON parsing fails
-    }
-
-    return {
-      summary: text.substring(0, 200),
-      insights: ['Analysis completed - see summary for details'],
-      recommendations: ['Review the analysis and apply insights to your business']
-    };
   }
 }

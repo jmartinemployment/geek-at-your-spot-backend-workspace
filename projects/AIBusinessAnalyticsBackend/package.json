@@ -13,6 +13,7 @@
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "@anthropic-ai/sdk": "^0.71.2",
+    "@geekquote/shared": "file:../../shared",
     "typescript": "^5.3.3",
     "ts-node": "^10.9.2",
     "nodemon": "^3.1.11",
