@@ -36,12 +36,14 @@ export class ConversationManager {
   async handleMessage(request: ChatRequest): Promise<ChatResponse> {
     let context: ConversationContext;
     let conversationId = request.conversationId;
+    let isNewConversation = false;
 
     if (conversationId && this.store.get(conversationId)) {
       context = this.store.get(conversationId)!;
     } else {
       conversationId = uuidv4();
       context = this.store.create(conversationId);
+      isNewConversation = true;
       if (request.userId) {
         context.userId = request.userId;
       }
@@ -64,8 +66,18 @@ export class ConversationManager {
     let response: string;
     let suggestedAction: string | undefined;
 
-    if (classification.confidence >= 70) {
-      // High confidence - acknowledge and offer next steps
+    // Check if this is a follow-up message with context
+    if (!isNewConversation && history.length > 0) {
+      // This is a follow-up - acknowledge their additional details
+      response = `Great! Thanks for those details. ${request.message}. Let me gather a few more things to provide an accurate estimate. 
+
+Could you also tell me:
+- What's your timeline for this project?
+- Do you have a budget range in mind?
+- Any specific design preferences or reference sites?`;
+      suggestedAction = classification.suggestedBackend;
+    } else if (classification.confidence >= 70) {
+      // First message with high confidence
       const serviceMap: Record<string, string> = {
         'web_development': 'website or application development',
         'analytics': 'business analytics and insights',
