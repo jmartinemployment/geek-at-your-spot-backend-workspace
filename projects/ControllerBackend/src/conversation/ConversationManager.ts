@@ -25,7 +25,6 @@ export class ConversationManager {
     this.store = new ConversationStore();
     this.classifier = new IntentClassifier(anthropicApiKey);
 
-    // Cleanup old conversations every hour
     setInterval(() => {
       const cleaned = this.store.cleanup();
       if (cleaned > 0) {
@@ -35,7 +34,6 @@ export class ConversationManager {
   }
 
   async handleMessage(request: ChatRequest): Promise<ChatResponse> {
-    // Get or create conversation
     let context: ConversationContext;
     let conversationId = request.conversationId;
 
@@ -49,7 +47,6 @@ export class ConversationManager {
       }
     }
 
-    // Add user message to history
     const userMessage: Message = {
       role: 'user',
       content: request.message,
@@ -57,28 +54,32 @@ export class ConversationManager {
     };
     this.store.addMessage(conversationId, userMessage);
 
-    // Classify intent
     const history = context.messages.slice(0, -1).map(m => `${m.role}: ${m.content}`);
     const classification = await this.classifier.classifyIntent(request.message, history);
 
-    // Update metadata
     this.store.updateMetadata(conversationId, {
       problemType: classification.primaryIntent
     });
 
-    // Determine response based on confidence
     let response: string;
     let suggestedAction: string | undefined;
 
     if (classification.confidence >= 70) {
-      // High confidence - route to backend
-      response = `I understand you need help with ${classification.primaryIntent.replace('_', ' ')}. ${classification.reasoning}`;
+      // High confidence - acknowledge and offer next steps
+      const serviceMap: Record<string, string> = {
+        'web_development': 'website or application development',
+        'analytics': 'business analytics and insights',
+        'marketing': 'marketing and content creation',
+        'website_analytics': 'website performance optimization'
+      };
+      
+      const serviceName = serviceMap[classification.primaryIntent] || 'your project';
+      
+      response = `I can help you with ${serviceName}! Let me gather some details to provide an accurate estimate. What specific features or goals do you have in mind?`;
       suggestedAction = classification.suggestedBackend;
     } else if (classification.confidence >= 40) {
-      // Medium confidence - ask clarifying question
       response = this.generateClarifyingQuestion(classification.primaryIntent, request.message);
     } else {
-      // Low confidence - general response
       response = `I'd like to help! Could you tell me more about what you're looking to accomplish? 
 
 Are you interested in:
@@ -88,7 +89,6 @@ Are you interested in:
 - Optimizing your website's performance`;
     }
 
-    // Add assistant response to history
     const assistantMessage: Message = {
       role: 'assistant',
       content: response,
