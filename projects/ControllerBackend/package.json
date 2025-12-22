@@ -9,14 +9,19 @@
     "start": "node dist/server.js"
   },
   "dependencies": {
-    "express": "^5.0.1",
+    "@anthropic-ai/sdk": "^0.71.2",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.0",
+    "@types/node": "^20.19.27",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
-    "typescript": "^5.3.3",
-    "ts-node": "^10.9.2",
+    "express": "^5.0.1",
     "nodemon": "^3.1.11",
-    "@types/express": "^5.0.0",
-    "@types/cors": "^2.8.19",
-    "@types/node": "^20.19.27"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3",
+    "uuid": "^13.0.0"
+  },
+  "devDependencies": {
+    "@types/uuid": "^10.0.0"
   }
 }
