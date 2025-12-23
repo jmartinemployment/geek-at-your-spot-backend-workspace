@@ -131,6 +131,9 @@ Respond with ONLY valid JSON:
     let html = `
 <div style="font-family: system-ui, -apple-system, sans-serif; max-width: 800px; margin: 0 auto;">
   <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 12px 12px 0 0; text-align: center;">
+    <img src="https://geekatyourspot.com/wp-content/uploads/2025/10/GeekAtYourSpot.svg" 
+         alt="Geek @ Your Spot" 
+         style="height: 60px; margin-bottom: 20px; filter: brightness(0) invert(1);">
     <h2 style="margin: 0 0 10px 0; font-size: 28px;">PROJECT ESTIMATE</h2>
     <h3 style="margin: 0; font-size: 20px; font-weight: normal;">${companyName}</h3>
     <p style="margin: 10px 0 0 0; opacity: 0.9;">Prepared for: ${contactName}</p>
