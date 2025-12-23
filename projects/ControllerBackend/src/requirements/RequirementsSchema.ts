@@ -49,7 +49,17 @@ export const requirementsSchema: Record<string, ServiceRequirements> = {
       { key: 'timeline', label: 'Desired Timeline', required: true, type: 'string', 
         description: 'launch date or duration in weeks/months' },
       { key: 'budget', label: 'Budget Range', required: true, type: 'object', 
-        description: 'min and max budget or fixed amount' }
+        description: 'min and max budget or fixed amount' },
+      
+      // Contact Information (added)
+      { key: 'contactName', label: 'Contact Name', required: true, type: 'string', 
+        description: 'full name of primary contact' },
+      { key: 'contactEmail', label: 'Email', required: true, type: 'string', 
+        description: 'email address for sending estimate' },
+      { key: 'contactPhone', label: 'Phone', required: false, type: 'string', 
+        description: 'phone number for follow-up' },
+      { key: 'companyName', label: 'Company Name', required: false, type: 'string', 
+        description: 'business or company name' }
     ]
   },
   
@@ -71,7 +81,17 @@ export const requirementsSchema: Record<string, ServiceRequirements> = {
       { key: 'timeline', label: 'Timeline', required: true, type: 'string', 
         description: 'campaign duration or ongoing' },
       { key: 'budget', label: 'Budget', required: true, type: 'object', 
-        description: 'monthly or project budget' }
+        description: 'monthly or project budget' },
+      
+      // Contact Information
+      { key: 'contactName', label: 'Contact Name', required: true, type: 'string', 
+        description: 'full name of primary contact' },
+      { key: 'contactEmail', label: 'Email', required: true, type: 'string', 
+        description: 'email address for sending estimate' },
+      { key: 'contactPhone', label: 'Phone', required: false, type: 'string', 
+        description: 'phone number for follow-up' },
+      { key: 'companyName', label: 'Company Name', required: false, type: 'string', 
+        description: 'business or company name' }
     ]
   },
   
@@ -93,7 +113,17 @@ export const requirementsSchema: Record<string, ServiceRequirements> = {
       { key: 'timeline', label: 'Timeline', required: true, type: 'string', 
         description: 'one-time or recurring analysis' },
       { key: 'budget', label: 'Budget', required: true, type: 'object', 
-        description: 'project or monthly budget' }
+        description: 'project or monthly budget' },
+      
+      // Contact Information
+      { key: 'contactName', label: 'Contact Name', required: true, type: 'string', 
+        description: 'full name of primary contact' },
+      { key: 'contactEmail', label: 'Email', required: true, type: 'string', 
+        description: 'email address for sending estimate' },
+      { key: 'contactPhone', label: 'Phone', required: false, type: 'string', 
+        description: 'phone number for follow-up' },
+      { key: 'companyName', label: 'Company Name', required: false, type: 'string', 
+        description: 'business or company name' }
     ]
   },
   
@@ -115,7 +145,17 @@ export const requirementsSchema: Record<string, ServiceRequirements> = {
       { key: 'timeline', label: 'Timeline', required: true, type: 'string', 
         description: 'urgency and duration' },
       { key: 'budget', label: 'Budget', required: true, type: 'object', 
-        description: 'budget range for optimization' }
+        description: 'budget range for optimization' },
+      
+      // Contact Information
+      { key: 'contactName', label: 'Contact Name', required: true, type: 'string', 
+        description: 'full name of primary contact' },
+      { key: 'contactEmail', label: 'Email', required: true, type: 'string', 
+        description: 'email address for sending estimate' },
+      { key: 'contactPhone', label: 'Phone', required: false, type: 'string', 
+        description: 'phone number for follow-up' },
+      { key: 'companyName', label: 'Company Name', required: false, type: 'string', 
+        description: 'business or company name' }
     ]
   }
 };

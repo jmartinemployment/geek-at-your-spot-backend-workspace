@@ -2,6 +2,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { ConversationStore } from '../storage/ConversationStore';
 import { IntentClassifier } from './IntentClassifier';
 import { RequirementsExtractor } from '../requirements/RequirementsExtractor';
+import { EstimateGenerator, EstimateResult } from '../estimation/EstimateGenerator';
 import { getRequiredFields } from '../requirements/RequirementsSchema';
 import { ConversationContext, Message, ConversationPhase } from '../types/conversation';
 import { v4 as uuidv4 } from 'uuid';
@@ -20,18 +21,21 @@ export interface ChatResponse {
   requirements?: Record<string, any>;
   escalationReason?: string;
   estimateReady?: boolean;
+  estimate?: EstimateResult;
 }
 
 export class ConversationManager {
   private store: ConversationStore;
   private classifier: IntentClassifier;
   private extractor: RequirementsExtractor;
+  private estimator: EstimateGenerator;
   private anthropic: Anthropic;
 
   constructor(anthropicApiKey: string) {
     this.store = new ConversationStore();
     this.classifier = new IntentClassifier(anthropicApiKey);
     this.extractor = new RequirementsExtractor(anthropicApiKey);
+    this.estimator = new EstimateGenerator(anthropicApiKey);
     this.anthropic = new Anthropic({ apiKey: anthropicApiKey });
 
     setInterval(() => {
@@ -94,7 +98,7 @@ export class ConversationManager {
         break;
       
       case 'complete':
-        response = this.handleComplete(conversationId, context);
+        response = await this.handleComplete(conversationId, context);
         break;
       
       default:
@@ -165,20 +169,23 @@ export class ConversationManager {
     
     const confirmation = await this.analyzeConfirmationResponse(userResponse);
 
-    // PURE AGREEMENT - Ready for estimate!
     if (confirmation.agreed && !confirmation.hasAdditions) {
       this.store.updatePhase(conversationId, 'complete');
       
+      // Generate estimate
+      const serviceType = context.metadata.problemType || 'general';
+      const estimate = await this.estimator.generate(serviceType, context.metadata.requirements);
+      
       return {
         conversationId,
-        response: `Perfect! I have everything I need. Let me prepare your project estimate...`,
+        response: `Perfect! Here's your project estimate:\n\n${estimate.formattedEstimate}\n\nI can email this to ${context.metadata.requirements.contactEmail || 'you'}. Would you like to proceed?`,
         phase: 'complete',
         estimateReady: true,
-        requirements: context.metadata.requirements
+        requirements: context.metadata.requirements,
+        estimate
       };
     }
 
-    // USER NEEDS DISCUSSION
     if (confirmation.needsDiscussion) {
       this.store.updatePhase(conversationId, 'human_escalation');
       this.store.updateMetadata(conversationId, {
@@ -193,7 +200,6 @@ export class ConversationManager {
       };
     }
 
-    // ADDING NEW REQUIREMENTS - Go back to gathering
     if (confirmation.hasAdditions) {
       this.store.updatePhase(conversationId, 'gathering');
       
@@ -205,9 +211,7 @@ export class ConversationManager {
       };
     }
 
-    // CORRECTIONS/DISAGREEMENTS
     if (isFirstConfirmation) {
-      // First disagreement - allow clarification
       this.store.updatePhase(conversationId, 'clarifying');
       this.store.incrementConfirmationAttempts(conversationId);
       
@@ -218,7 +222,6 @@ export class ConversationManager {
         readinessScore: context.metadata.readinessScore
       };
     } else {
-      // Second disagreement - escalate to human
       this.store.updatePhase(conversationId, 'human_escalation');
       this.store.incrementConfirmationAttempts(conversationId);
       this.store.updateMetadata(conversationId, {
@@ -271,16 +274,22 @@ export class ConversationManager {
     };
   }
 
-  private handleComplete(
+  private async handleComplete(
     conversationId: string,
     context: ConversationContext
-  ): ChatResponse {
+  ): Promise<ChatResponse> {
+    
+    // If estimate already generated, just reference it
+    const serviceType = context.metadata.problemType || 'general';
+    const estimate = await this.estimator.generate(serviceType, context.metadata.requirements);
+    
     return {
       conversationId,
-      response: `Your estimate is ready! Is there anything else you'd like to know about the project?`,
+      response: `Here's your estimate again:\n\n${estimate.formattedEstimate}\n\nIs there anything else you'd like to know about the project?`,
       phase: 'complete',
       estimateReady: true,
-      requirements: context.metadata.requirements
+      requirements: context.metadata.requirements,
+      estimate
     };
   }
 
@@ -311,6 +320,9 @@ ${conversationText}
 YOUR TASK:
 Ask ONE natural follow-up question to gather the next most important missing field.
 Be conversational and friendly. Don't ask for everything at once.
+
+IMPORTANT: Gather contact information (name, email, company) naturally near the END of the conversation, 
+not at the beginning. Example: "To send you this estimate, what's the best email address?"
 
 Respond with just your question:`;
 
@@ -372,19 +384,15 @@ Categorize their response:
 
 3. **ADDING REQUIREMENTS**: They agree BUT want to add something NEW
    - Examples: "yes, and also...", "can we add...", "I also need...", "plus..."
-   - This is NOT a disagreement, it's expanding scope
 
 4. **CORRECTIONS**: They disagree with what was captured, want to change something
    - Examples: "no, the budget is...", "actually it's...", "you got X wrong"
 
-5. **TRUE DISAGREEMENT**: They fundamentally disagree or it's completely wrong
-   - Examples: "no that's all wrong", "I never said that", "not what I meant"
-
 Respond ONLY with JSON:
 {
-  "agreed": boolean (true for pure agreement),
+  "agreed": boolean,
   "needsDiscussion": boolean,
-  "hasAdditions": boolean (true if adding new requirements),
+  "hasAdditions": boolean,
   "additionDetails": "what they want to add, or empty string",
   "clarificationNeeded": "what needs correction, or empty string"
 }`;
