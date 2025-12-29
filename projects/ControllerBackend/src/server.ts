@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { ConversationManager } from './conversation/ConversationManager';
+import { sendContactEmail, ContactFormData } from './services/emailService';
 
 dotenv.config();
 
@@ -33,7 +34,8 @@ app.get('/', (req, res) => {
     features: {
       smartConversations: true,
       intentClassification: true,
-      requirementsGathering: true
+      requirementsGathering: true,
+      emailNotifications: true
     }
   });
 });
@@ -45,7 +47,61 @@ app.get('/health', (req, res) => {
   });
 });
 
-// NEW: Smart conversation endpoint
+// NEW: Email endpoint
+app.post('/api/email', async (req, res) => {
+  try {
+    const { name, email, message, phone, company, service } = req.body;
+
+    // Validation
+    if (!name || !email || !message) {
+      return res.status(400).json({
+        success: false,
+        message: 'Missing required fields: name, email, message'
+      });
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid email address'
+      });
+    }
+
+    // Prepare contact data
+    const contactData: ContactFormData = {
+      name: name.trim(),
+      email: email.trim().toLowerCase(),
+      message: message.trim(),
+      phone: phone?.trim(),
+      company: company?.trim(),
+    };
+
+    // If service field exists, prepend it to the message
+    if (service) {
+      contactData.message = `Service: ${service}\n\n${contactData.message}`;
+    }
+
+    // Send email
+    const result = await sendContactEmail(contactData);
+
+    res.json({
+      success: true,
+      message: 'Email sent successfully',
+      id: result.id
+    });
+  } catch (error: any) {
+    console.error('Email endpoint error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to send email. Please try again.',
+      error: error.message
+    });
+  }
+});
+
+// Smart conversation endpoint
 app.post('/api/chat', async (req, res) => {
   try {
     const { conversationId, message, userId } = req.body;
@@ -70,7 +126,7 @@ app.post('/api/chat', async (req, res) => {
   }
 });
 
-// NEW: Get conversation history
+// Get conversation history
 app.get('/api/conversation/:id', (req, res) => {
   const { id } = req.params;
   const conversation = conversationManager.getConversation(id);
@@ -82,7 +138,7 @@ app.get('/api/conversation/:id', (req, res) => {
   res.json(conversation);
 });
 
-// NEW: List all conversations (for admin/debugging)
+// List all conversations (for admin/debugging)
 app.get('/api/conversations', (req, res) => {
   const conversations = conversationManager.getAllConversations();
   res.json({
@@ -97,7 +153,7 @@ app.get('/api/conversations', (req, res) => {
   });
 });
 
-// Existing proxy routes (unchanged)
+// Proxy routes
 
 // Proxy to WebDevelopmentBackend
 app.use('/api/web-dev', async (req, res) => {
@@ -180,6 +236,7 @@ app.listen(port, () => {
   console.log(`🎮 Controller Backend v2.0 on port ${port}`);
   console.log(`===========================================`);
   console.log(`📡 Health: http://localhost:${port}/health`);
+  console.log(`📧 Email: http://localhost:${port}/api/email`);
   console.log(`💬 Smart Chat: http://localhost:${port}/api/chat`);
   console.log(`🔀 Web Dev: http://localhost:${port}/api/web-dev`);
   console.log(`📊 Business Analytics: http://localhost:${port}/api/ai-analytics`);
