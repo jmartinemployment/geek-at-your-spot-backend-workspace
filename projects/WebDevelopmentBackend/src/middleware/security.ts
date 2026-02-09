@@ -4,6 +4,7 @@
 // ============================================
 
 import { Request, Response, NextFunction } from 'express';
+import { logger } from '../utils/logger';
 
 /**
  * Check API Key Authentication
@@ -47,7 +48,7 @@ export const checkIPWhitelist = (
 
   // If no IPs configured, allow all (for development)
   if (allowedIPs.length === 0 || allowedIPs[0] === '') {
-    console.warn('⚠️  IP whitelist not configured - allowing all IPs');
+    logger.warn('IP whitelist not configured - allowing all IPs');
     next();
     return;
   }
@@ -59,7 +60,7 @@ export const checkIPWhitelist = (
   )?.split(',')[0].trim();
 
   if (!clientIP || !allowedIPs.includes(clientIP)) {
-    console.warn(`🚫 Blocked IP: ${clientIP}`);
+    logger.warn(`Blocked IP: ${clientIP}`);
     res.status(403).json({
       error: 'Access denied',
       code: 'IP_NOT_ALLOWED'
@@ -67,7 +68,7 @@ export const checkIPWhitelist = (
     return;
   }
 
-  console.log(`✅ Allowed IP: ${clientIP}`);
+  logger.info(`Allowed IP: ${clientIP}`);
   next();
 };
 
@@ -84,7 +85,7 @@ export const requestLogger = (
   const path = req.path;
   const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || req.ip;
 
-  console.log(`[${timestamp}] ${method} ${path} - IP: ${ip}`);
+  logger.info(`${method} ${path}`, { ip, timestamp });
 
   next();
 };
@@ -96,9 +97,9 @@ export const errorHandler = (
   error: Error,
   req: Request,
   res: Response,
-  next: NextFunction
+  _next: NextFunction
 ): void => {
-  console.error('❌ Error:', error);
+  logger.error('Unhandled error:', { error });
 
   // Don't leak error details in production
   const isDevelopment = process.env.NODE_ENV === 'development';
@@ -118,7 +119,7 @@ export const validateChatRequest = (
   res: Response,
   next: NextFunction
 ): void => {
-  const { messages, leadInfo } = req.body;
+  const { messages } = req.body;
 
   if (!messages || !Array.isArray(messages)) {
     res.status(400).json({

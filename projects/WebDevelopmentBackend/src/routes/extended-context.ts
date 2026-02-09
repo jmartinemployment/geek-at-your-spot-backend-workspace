@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Router, Request, Response } from 'express';
 import { ExtendedContextService } from '../extended-context';
 
@@ -34,10 +33,10 @@ router.post('/messages', async (req: Request, res: Response) => {
     );
 
     return res.status(200).json(message);
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to add message',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -66,9 +65,9 @@ router.get('/messages/:conversationId', (req: Request, res: Response) => {
     const { startIndex, endIndex, limit, includeCompressed, minImportance } = req.query;
 
     const messages = extContextService.getMessages(conversationId, {
-      startIndex: startIndex ? Number.parseInt(startIndex as string) : undefined,
-      endIndex: endIndex ? Number.parseInt(endIndex as string) : undefined,
-      limit: limit ? Number.parseInt(limit as string) : undefined,
+      startIndex: startIndex ? Number.parseInt(startIndex as string, 10) : undefined,
+      endIndex: endIndex ? Number.parseInt(endIndex as string, 10) : undefined,
+      limit: limit ? Number.parseInt(limit as string, 10) : undefined,
       includeCompressed: includeCompressed === 'true',
       minImportance: minImportance ? Number.parseFloat(minImportance as string) : undefined,
     });
@@ -78,10 +77,10 @@ router.get('/messages/:conversationId', (req: Request, res: Response) => {
       messages,
       total: messages.length,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to get messages',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -116,10 +115,10 @@ router.get('/window/:conversationId', (req: Request, res: Response) => {
     }
 
     return res.status(200).json(window);
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to get window',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -154,10 +153,10 @@ router.get('/stats/:conversationId', (req: Request, res: Response) => {
     }
 
     return res.status(200).json(stats);
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to get stats',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -188,10 +187,10 @@ router.post('/compress/:conversationId', async (req: Request, res: Response) => 
     const result = await extContextService.compress(conversationId, strategy);
 
     return res.status(200).json(result);
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Compression failed',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -222,10 +221,10 @@ router.post('/snapshots/:conversationId', async (req: Request, res: Response) =>
     const snapshot = await extContextService.createSnapshot(conversationId, description);
 
     return res.status(200).json(snapshot);
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to create snapshot',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -258,10 +257,10 @@ router.get('/snapshots/:conversationId', (req: Request, res: Response) => {
       snapshots,
       total: snapshots.length,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to get snapshots',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -300,10 +299,10 @@ router.post('/restore/:conversationId', async (req: Request, res: Response) => {
     return res.status(200).json({
       message: 'Snapshot restored successfully',
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to restore snapshot',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -341,10 +340,10 @@ router.post('/summarize', async (req: Request, res: Response) => {
     });
 
     return res.status(200).json(result);
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Summarization failed',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -390,10 +389,10 @@ router.post('/split/:conversationId', (req: Request, res: Response) => {
       chunks,
       total: chunks.length,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to split conversation',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -427,10 +426,10 @@ router.post('/count-tokens', (req: Request, res: Response) => {
       tokens,
       characters: text.length,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to count tokens',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -463,10 +462,10 @@ router.get('/events/:conversationId', (req: Request, res: Response) => {
       events,
       total: events.length,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to get events',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -497,10 +496,10 @@ router.delete('/:conversationId', (req: Request, res: Response) => {
     return res.status(200).json({
       message: 'Conversation cleared successfully',
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to clear conversation',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -523,10 +522,10 @@ router.get('/health', async (req: Request, res: Response) => {
     const health = await extContextService.healthCheck();
 
     return res.status(200).json(health);
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Health check failed',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -548,10 +547,10 @@ router.get('/stats', (req: Request, res: Response) => {
     const stats = extContextService.getStats();
 
     return res.status(200).json(stats);
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to get stats',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });

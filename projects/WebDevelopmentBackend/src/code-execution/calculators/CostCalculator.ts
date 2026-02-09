@@ -160,8 +160,6 @@ export class CostCalculator {
 
     // Calculate totals
     const total = breakdown.reduce((sum, item) => sum + item.subtotal, 0);
-    const totalHours = breakdown.reduce((sum, item) => sum + item.hours, 0);
-
     // Add contingency (15%)
     const contingency = total * 0.15;
     const finalTotal = total + contingency;

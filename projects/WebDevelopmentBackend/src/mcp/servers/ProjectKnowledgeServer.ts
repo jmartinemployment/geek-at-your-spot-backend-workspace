@@ -1,10 +1,9 @@
-// @ts-nocheck
+// @ts-nocheck - Prisma schema fields don't match MCP type expectations (structural refactor needed)
 // ============================================
 // src/mcp/servers/ProjectKnowledgeServer.ts
 // MCP Server: Project Knowledge Database
 // ============================================
 
-import { PrismaClient } from '@prisma/client';
 import {
   MCPServer,
   MCPTool,
@@ -224,10 +223,10 @@ export class ProjectKnowledgeServer implements MCPServer {
           executionTime: Date.now(),
         },
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         success: false,
-        error: `Failed to search projects: ${error.message}`,
+        error: `Failed to search projects: ${error instanceof Error ? error.message : String(error)}`,
       };
     }
   }
@@ -317,10 +316,10 @@ export class ProjectKnowledgeServer implements MCPServer {
           executionTime: Date.now(),
         },
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         success: false,
-        error: `Failed to get statistics: ${error.message}`,
+        error: `Failed to get statistics: ${error instanceof Error ? error.message : String(error)}`,
       };
     }
   }
@@ -333,7 +332,7 @@ export class ProjectKnowledgeServer implements MCPServer {
     context: MCPExecutionContext
   ): Promise<MCPToolResult> {
     try {
-      const { project_type, requirements, budget, timeline_weeks } = params;
+      const { project_type, budget, timeline_weeks } = params;
 
       const similarProjects = await context.prisma.project.findMany({
         where: {
@@ -406,10 +405,10 @@ export class ProjectKnowledgeServer implements MCPServer {
           executionTime: Date.now(),
         },
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         success: false,
-        error: `Failed to get recommendations: ${error.message}`,
+        error: `Failed to get recommendations: ${error instanceof Error ? error.message : String(error)}`,
       };
     }
   }

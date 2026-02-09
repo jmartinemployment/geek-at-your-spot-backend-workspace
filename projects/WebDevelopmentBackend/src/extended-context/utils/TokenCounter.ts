@@ -17,7 +17,7 @@ export class TokenCounter {
    * Count tokens in text (approximate)
    * Uses character-based estimation since we don't have tiktoken in Node.js
    */
-  static countTokens(text: string, options?: TokenCountOptions): number {
+  static countTokens(text: string, _options?: TokenCountOptions): number {
     if (!text || text.length === 0) {
       return 0;
     }

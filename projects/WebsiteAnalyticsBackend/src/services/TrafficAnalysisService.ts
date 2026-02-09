@@ -64,7 +64,7 @@ Format as JSON with keys: summary, insights (array), recommendations (array), me
 
   private parseTrafficResponse(text: string): TrafficAnalysisResult {
     try {
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      const jsonMatch = /\{[\s\S]*\}/.exec(text);
       if (jsonMatch) {
         return JSON.parse(jsonMatch[0]);
       }

@@ -129,12 +129,12 @@ export class CodeExecutionService {
         this.stats.totalExecutionTime / this.stats.totalExecutions;
 
       return result;
-    } catch (error: any) {
+    } catch (error: unknown) {
       this.stats.failedExecutions++;
 
       return {
         success: false,
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
         executionTime: Date.now() - startTime,
       };
     }

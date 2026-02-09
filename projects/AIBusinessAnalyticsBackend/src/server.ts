@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { AnalyticsService } from './analytics/AnalyticsService';
+import { logger } from './utils/logger';
 
 dotenv.config();
 
@@ -14,7 +15,7 @@ app.use(express.json());
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY || '';
 
 if (!ANTHROPIC_API_KEY) {
-  console.error('Error: ANTHROPIC_API_KEY is required');
+  logger.error('ANTHROPIC_API_KEY is required');
   process.exit(1);
 }
 
@@ -42,13 +43,13 @@ app.post('/api/analytics/revenue', async (req: Request, res: Response) => {
       data: req.body.data
     });
     res.json(result);
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
+  } catch (error: unknown) {
+    res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
   }
 });
 
 const server = app.listen(port, () => {
-  console.log(`\nServer running on port ${port}\n`);
+  logger.info(`AI Business Analytics Backend started on port ${port}`);
 });
 
 // Keep alive

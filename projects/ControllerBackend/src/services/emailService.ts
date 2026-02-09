@@ -1,6 +1,7 @@
 import { Resend } from 'resend';
 import { render } from '@react-email/render';
 import ContactFormEmail from '../emails/templates/ContactFormEmail';
+import { logger } from '../utils/logger';
 
 // Lazy initialization - only create Resend when actually sending email
 let resendInstance: Resend | null = null;
@@ -25,12 +26,11 @@ export interface ContactFormData {
 
 export async function sendContactEmail(data: ContactFormData) {
   try {
-    console.log('📧 Starting email send process...');
+    logger.info('Starting email send process');
     
     const toEmails = process.env.TO_EMAIL!.split(',').map(email => email.trim());
     
-    console.log('📧 FROM:', process.env.FROM_EMAIL);
-    console.log('📧 TO (array):', toEmails);
+    logger.info('Email configuration', { from: process.env.FROM_EMAIL, to: toEmails });
 
     const emailHtml = await render(
       ContactFormEmail({
@@ -55,15 +55,15 @@ export async function sendContactEmail(data: ContactFormData) {
     });
     
     if (result.error) {
-      console.error('❌ Resend API error:', result.error);
+      logger.error('Resend API error', { error: result.error });
       throw new Error(result.error.message);
     }
     
-    console.log('📧 Email sent successfully! ID:', result.data?.id);
+    logger.info('Email sent successfully', { id: result.data?.id });
 
     return { success: true, id: result.data?.id };
   } catch (error) {
-    console.error('❌ Error sending email:', error);
+    logger.error('Error sending email', { error });
     throw error;
   }
 }

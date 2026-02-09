@@ -8,6 +8,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import { sendContactEmail, ContactFormData } from './emailService';
+import { logger } from './utils/logger';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -94,11 +95,11 @@ app.post('/api/email', emailLimiter, validateContactForm, async (req: Request, r
       message: 'Email sent successfully',
       id: result.id,
     });
-  } catch (error: any) {
-    console.error('Error in /api/email:', error);
+  } catch (error: unknown) {
+    logger.error('Error in /api/email', { error });
     res.status(500).json({
       error: 'Failed to send email',
-      message: error.message || 'Internal server error',
+      message: error instanceof Error ? error.message : 'Internal server error',
     });
   }
 });
@@ -110,7 +111,8 @@ app.use((req: Request, res: Response) => {
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`🚀 Email service running on port ${PORT}`);
-  console.log(`📧 Environment: ${process.env.NODE_ENV}`);
-  console.log(`🔐 CORS allowed origins: ${allowedOrigins.join(', ')}`);
+  logger.info(`Email service started on port ${PORT}`, {
+    environment: process.env.NODE_ENV,
+    allowedOrigins: allowedOrigins.join(', ')
+  });
 });

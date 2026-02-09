@@ -7,15 +7,10 @@ import Anthropic from '@anthropic-ai/sdk';
 import {
   AgentConfig,
   AgentState,
-  AgentStatus,
   AgentMessage,
   AgentTask,
   AgentResponse,
   AgentMetrics,
-  AgentToolCall,
-  AgentToolResult,
-  MessagePriority,
-  TaskStatus,
 } from '../types';
 
 export abstract class BaseAgent {
@@ -109,14 +104,14 @@ export abstract class BaseAgent {
       this.state.tasksCompleted++;
 
       return agentResponse;
-    } catch (error: any) {
+    } catch (error: unknown) {
       const duration = Date.now() - startTime;
       this.updateMetrics(duration, false);
 
       this.state.status = 'idle';
       this.state.tasksFailed++;
 
-      throw new Error(`Agent ${this.config.id} failed to process message: ${error.message}`);
+      throw new Error(`Agent ${this.config.id} failed to process message: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -150,7 +145,7 @@ export abstract class BaseAgent {
       this.metrics.currentLoad--;
 
       return result;
-    } catch (error: any) {
+    } catch (error: unknown) {
       const duration = Date.now() - startTime;
       this.updateMetrics(duration, false);
 
@@ -166,7 +161,7 @@ export abstract class BaseAgent {
   /**
    * Check if agent can handle a task (override in subclasses)
    */
-  protected canHandleTask(task: AgentTask): boolean {
+  protected canHandleTask(_task: AgentTask): boolean {
     // Default implementation - subclasses should override
     return true;
   }
@@ -238,7 +233,7 @@ export abstract class BaseAgent {
       response.nextActions = actionsMatch[1]
         .split('\n')
         .map(line => line.trim())
-        .filter(line => line && line.startsWith('-'))
+        .filter(line => line?.startsWith('-'))
         .map(line => line.substring(1).trim());
     }
 

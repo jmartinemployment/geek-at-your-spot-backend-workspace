@@ -36,10 +36,10 @@ router.post('/execute', async (req: Request, res: Response) => {
     });
 
     return res.status(200).json(result);
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'A2A execution failed',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -74,10 +74,10 @@ router.get('/conversations/:conversationId', (req: Request, res: Response) => {
     }
 
     return res.status(200).json(conversation);
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to get conversation',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -106,10 +106,10 @@ router.get('/conversations/:conversationId/summary', (req: Request, res: Respons
     const summary = a2aService.getConversationSummary(conversationId);
 
     return res.status(200).json(summary);
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to get conversation summary',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -140,10 +140,10 @@ router.delete('/conversations/:conversationId', (req: Request, res: Response) =>
     return res.status(200).json({
       message: 'Conversation deleted successfully',
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to delete conversation',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -175,10 +175,10 @@ router.get('/conversations/user/:userId', (req: Request, res: Response) => {
       conversations,
       total: conversations.length,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to get user conversations',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -204,10 +204,10 @@ router.get('/conversations/recent', (req: Request, res: Response) => {
       conversations,
       total: conversations.length,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to get recent conversations',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -232,10 +232,10 @@ router.get('/conversations/active', (req: Request, res: Response) => {
       conversations,
       total: conversations.length,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to get active conversations',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -269,10 +269,10 @@ router.get('/conversations/search', (req: Request, res: Response) => {
       total: conversations.length,
       query,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Search failed',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -297,10 +297,10 @@ router.get('/agents', (req: Request, res: Response) => {
       agents,
       total: agents.length,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to get agents',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -333,10 +333,10 @@ router.get('/agents/role/:role', (req: Request, res: Response) => {
       agents,
       total: agents.length,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to get agents by role',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -375,10 +375,10 @@ router.post('/agents/:agentId/enable', (req: Request, res: Response) => {
     return res.status(200).json({
       message: `Agent ${enabled ? 'enabled' : 'disabled'} successfully`,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to update agent',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -403,10 +403,10 @@ router.get('/metrics', (req: Request, res: Response) => {
       metrics,
       total: metrics.length,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to get metrics',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -428,10 +428,10 @@ router.get('/stats', (req: Request, res: Response) => {
     const stats = a2aService.getStats();
 
     return res.status(200).json(stats);
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to get stats',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -454,10 +454,10 @@ router.get('/health', async (req: Request, res: Response) => {
     const health = await a2aService.healthCheck();
 
     return res.status(200).json(health);
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Health check failed',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -483,10 +483,10 @@ router.put('/strategy', (req: Request, res: Response) => {
       message: 'Strategy updated successfully',
       strategy: a2aService.getStrategy(),
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to update strategy',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -508,10 +508,10 @@ router.get('/strategy', (req: Request, res: Response) => {
     const strategy = a2aService.getStrategy();
 
     return res.status(200).json(strategy);
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to get strategy',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });

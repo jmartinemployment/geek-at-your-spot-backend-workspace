@@ -38,10 +38,10 @@ router.post('/execute', async (req: Request, res: Response) => {
     });
 
     return res.status(200).json(result);
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Code execution failed',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -77,10 +77,10 @@ router.post('/calculate-cost', async (req: Request, res: Response) => {
     });
 
     return res.status(200).json(result);
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Cost calculation failed',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -116,10 +116,10 @@ router.post('/generate-timeline', async (req: Request, res: Response) => {
     });
 
     return res.status(200).json(result);
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Timeline generation failed',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -154,10 +154,10 @@ router.post('/check-feasibility', async (req: Request, res: Response) => {
     });
 
     return res.status(200).json(result);
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Feasibility check failed',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -187,10 +187,10 @@ router.post('/validate', async (req: Request, res: Response) => {
     const result = codeExecService.validate(data, rules);
 
     return res.status(200).json(result);
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Validation failed',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -220,10 +220,10 @@ router.post('/validate-syntax', async (req: Request, res: Response) => {
     const result = await codeExecService.validateSyntax(language, code);
 
     return res.status(200).json(result);
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Syntax validation failed',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -248,10 +248,10 @@ router.get('/features', (req: Request, res: Response) => {
       features,
       total: features.length,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to get features',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -276,10 +276,10 @@ router.get('/health', async (req: Request, res: Response) => {
     const health = await codeExecService.healthCheck();
 
     return res.status(200).json(health);
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Health check failed',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -301,10 +301,10 @@ router.get('/stats', (req: Request, res: Response) => {
     const stats = codeExecService.getStats();
 
     return res.status(200).json(stats);
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to get stats',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });

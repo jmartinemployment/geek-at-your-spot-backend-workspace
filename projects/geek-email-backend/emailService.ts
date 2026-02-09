@@ -1,6 +1,7 @@
 import { Resend } from 'resend';
 import { render } from '@react-email/render';
 import ContactFormEmail from './emails/templates/ContactFormEmail';
+import { logger } from './utils/logger';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -14,18 +15,20 @@ export interface ContactFormData {
 
 export async function sendContactEmail(data: ContactFormData) {
   try {
-    console.log('📧 Starting email send process...');
-    
+    logger.info('Starting email send process');
+
     // Convert comma-separated TO_EMAIL into an array
     const toEmails = process.env.TO_EMAIL!.split(',').map(email => email.trim());
-    
-    console.log('📧 API Key exists:', !!process.env.RESEND_API_KEY);
-    console.log('📧 FROM:', process.env.FROM_EMAIL);
-    console.log('📧 TO (array):', toEmails);
-    console.log('📧 Contact data:', data);
+
+    logger.info('Email configuration', {
+      apiKeyExists: !!process.env.RESEND_API_KEY,
+      from: process.env.FROM_EMAIL,
+      to: toEmails,
+      contactData: data
+    });
 
     // Render React component to HTML
-    console.log('📧 Rendering email template...');
+    logger.info('Rendering email template');
     const emailHtml = await render(
       ContactFormEmail({
         name: data.name,
@@ -35,13 +38,13 @@ export async function sendContactEmail(data: ContactFormData) {
         company: data.company,
       })
     );
-    console.log('📧 Template rendered successfully, HTML length:', emailHtml.length);
+    logger.info('Template rendered successfully', { htmlLength: emailHtml.length });
 
     // Generate plain text version
     const textContent = generatePlainText(data);
-    console.log('📧 Plain text generated, length:', textContent.length);
+    logger.info('Plain text generated', { textLength: textContent.length });
 
-    console.log('�� Calling Resend API...');
+    logger.info('Calling Resend API');
     const result = await resend.emails.send({
       from: process.env.FROM_EMAIL!,
       to: toEmails, // Now it's an array!
@@ -51,18 +54,18 @@ export async function sendContactEmail(data: ContactFormData) {
       replyTo: data.email,
     });
 
-    console.log('📧 Resend API response:', JSON.stringify(result, null, 2));
+    logger.info('Resend API response', { result });
     
     if (result.error) {
-      console.error('❌ Resend API error:', result.error);
+      logger.error('Resend API error', { error: result.error });
       throw new Error(result.error.message);
     }
     
-    console.log('📧 Email sent successfully! ID:', result.data?.id);
+    logger.info('Email sent successfully', { id: result.data?.id });
 
     return { success: true, id: result.data?.id };
   } catch (error) {
-    console.error('❌ Error sending email:', error);
+    logger.error('Error sending email', { error });
     throw error;
   }
 }

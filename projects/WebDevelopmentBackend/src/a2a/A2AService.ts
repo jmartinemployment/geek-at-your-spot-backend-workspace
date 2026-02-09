@@ -6,6 +6,7 @@
 import { AgentRegistry } from './registry/AgentRegistry';
 import { ConversationManager } from './conversation/ConversationManager';
 import { Orchestrator } from './orchestrator/Orchestrator';
+import { logger } from '../utils/logger';
 import {
   A2AConfig,
   AgentConfig,
@@ -13,7 +14,6 @@ import {
   OrchestrationResult,
   OrchestrationStrategy,
   AgentRole,
-  AgentCapabilities,
   ConversationContext,
   ConversationSummary,
   AgentMetrics,
@@ -75,7 +75,7 @@ export class A2AService {
     this.initialized = true;
 
     if (this.config.enableLogging) {
-      console.log('[A2A] Service initialized with', this.agentRegistry.getAgentCount(), 'agents');
+      logger.info('[A2A] Service initialized with', { agentCount: this.agentRegistry.getAgentCount() });
     }
   }
 
@@ -239,7 +239,7 @@ export class A2AService {
     const result = await this.orchestrator.orchestrate(request);
 
     if (this.config.enableLogging) {
-      console.log('[A2A] Orchestration completed:', {
+      logger.info('[A2A] Orchestration completed:', {
         conversationId: result.conversationId,
         success: result.success,
         agentsInvolved: result.agentsInvolved.length,
@@ -258,7 +258,7 @@ export class A2AService {
     this.agentRegistry.registerAgent(config);
 
     if (this.config.enableLogging) {
-      console.log('[A2A] Registered agent:', config.id, '-', config.role);
+      logger.info('[A2A] Registered agent:', { agentId: config.id, role: config.role });
     }
   }
 
@@ -269,7 +269,7 @@ export class A2AService {
     this.agentRegistry.unregisterAgent(agentId);
 
     if (this.config.enableLogging) {
-      console.log('[A2A] Unregistered agent:', agentId);
+      logger.info('[A2A] Unregistered agent:', { agentId });
     }
   }
 
@@ -351,7 +351,7 @@ export class A2AService {
     this.orchestrator.updateStrategy(strategy);
 
     if (this.config.enableLogging) {
-      console.log('[A2A] Updated orchestration strategy:', strategy);
+      logger.info('[A2A] Updated orchestration strategy:', { strategy });
     }
   }
 
@@ -369,7 +369,7 @@ export class A2AService {
     this.agentRegistry.setAgentEnabled(agentId, enabled);
 
     if (this.config.enableLogging) {
-      console.log('[A2A] Agent', agentId, enabled ? 'enabled' : 'disabled');
+      logger.info(`[A2A] Agent ${enabled ? 'enabled' : 'disabled'}`, { agentId });
     }
   }
 
@@ -398,7 +398,7 @@ export class A2AService {
     this.conversationManager.deleteConversation(conversationId);
 
     if (this.config.enableLogging) {
-      console.log('[A2A] Deleted conversation:', conversationId);
+      logger.info('[A2A] Deleted conversation:', { conversationId });
     }
   }
 
@@ -432,7 +432,7 @@ export class A2AService {
     this.initialized = false;
 
     if (this.config.enableLogging) {
-      console.log('[A2A] Service reset');
+      logger.info('[A2A] Service reset');
     }
   }
 
@@ -443,7 +443,7 @@ export class A2AService {
     this.config = { ...this.config, ...config };
 
     if (this.config.enableLogging) {
-      console.log('[A2A] Configuration updated');
+      logger.info('[A2A] Configuration updated');
     }
   }
 

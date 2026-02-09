@@ -45,9 +45,6 @@ export class TimelineGenerator {
     // Calculate critical path
     const criticalPath = this.calculateCriticalPath(dependencyGraph);
 
-    // Identify parallelizable tasks
-    const parallelizable = this.identifyParallelTasks(dependencyGraph);
-
     // Generate phases with tasks
     const phases: TimelinePhase[] = [];
     let currentWeek = 1;
@@ -125,7 +122,6 @@ export class TimelineGenerator {
   private calculateCriticalPath(graph: DependencyNode[]): DependencyNode[] {
     // Calculate earliest start times
     const earliestStart: Map<string, number> = new Map();
-    const processed = new Set<string>();
 
     const calculateEarliestStart = (node: DependencyNode): number => {
       if (earliestStart.has(node.id)) {
@@ -246,7 +242,7 @@ export class TimelineGenerator {
     workHoursPerDay: number,
     workDaysPerWeek: number,
     buffer: number,
-    dependencyGraph: DependencyNode[]
+    _dependencyGraph: DependencyNode[]
   ): TimelinePhase {
     const tasks: TimelineTask[] = [];
     let currentDay = 0;

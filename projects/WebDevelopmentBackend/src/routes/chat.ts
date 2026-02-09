@@ -10,6 +10,7 @@ import { ConversationRepository } from '../repositories/ConversationRepository';
 import { ClaudeService } from '../services/ClaudeService';
 import { checkApiKey, validateChatRequest } from '../middleware/security';
 import { ChatRequest, ChatResponse } from '../types';
+import { logger } from '../utils/logger';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -29,7 +30,7 @@ router.post(
     try {
       const { messages, leadInfo }: ChatRequest = req.body;
 
-      console.log('💬 Chat request received:', {
+      logger.info('Chat request received', {
         messageCount: messages.length,
         hasLeadInfo: !!leadInfo
       });
@@ -40,7 +41,7 @@ router.post(
         lead = await leadRepo.findByEmail(leadInfo.email);
 
         if (!lead) {
-          console.log('📝 Creating new lead:', leadInfo.email);
+          logger.info('Creating new lead', { email: leadInfo.email });
           lead = await leadRepo.create({
             name: leadInfo.name || 'Anonymous',
             email: leadInfo.email,
@@ -52,15 +53,15 @@ router.post(
             userAgent: req.headers['user-agent']
           });
         } else {
-          console.log('✅ Found existing lead:', lead.id);
+          logger.info('Found existing lead', { leadId: lead.id });
         }
       }
 
       // Get AI response from Claude
-      console.log('🤖 Calling Claude API...');
+      logger.info('Calling Claude API...');
       const aiResult = await claudeService.chat(messages);
 
-      console.log('✅ Claude response received:', {
+      logger.info('Claude response received', {
         hasEstimate: !!aiResult.estimate,
         tokenCount: aiResult.tokenCount
       });
@@ -78,7 +79,7 @@ router.post(
 
         // If we got an estimate, update the lead
         if (aiResult.estimate) {
-          console.log('💰 Updating lead with estimate');
+          logger.info('Updating lead with estimate');
           await leadRepo.addEstimate(lead.id, {
             minBudget: aiResult.estimate.minBudget,
             maxBudget: aiResult.estimate.maxBudget,
@@ -97,7 +98,7 @@ router.post(
       res.json(response);
 
     } catch (error) {
-      console.error('❌ Chat error:', error);
+      logger.error('Chat error:', { error });
       res.status(500).json({
         error: 'Failed to process chat request',
         code: 'CHAT_ERROR'
@@ -128,7 +129,7 @@ router.get(
 
       res.json(conversation);
     } catch (error) {
-      console.error('Error fetching conversation:', error);
+      logger.error('Error fetching conversation:', { error });
       res.status(500).json({
         error: 'Failed to fetch conversation',
         code: 'FETCH_ERROR'

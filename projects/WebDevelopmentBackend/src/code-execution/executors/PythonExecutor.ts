@@ -3,10 +3,10 @@
 // Sandboxed Python Execution
 // ============================================
 
-import { spawn } from 'child_process';
-import * as path from 'path';
-import * as fs from 'fs/promises';
-import * as os from 'os';
+import { spawn } from 'node:child_process';
+import * as path from 'node:path';
+import * as fs from 'node:fs/promises';
+import * as os from 'node:os';
 import {
   CodeExecutionResult,
   ExecutionContext,
@@ -81,12 +81,12 @@ export class PythonExecutor {
         executionTime,
         logs: [...output.logs, ...errorLogs],
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       const executionTime = Date.now() - startTime;
 
       return {
         success: false,
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
         executionTime,
         logs,
       };
@@ -133,10 +133,10 @@ if __name__ == '__main__':
         valid: result.exitCode === 0,
         error: result.exitCode !== 0 ? result.stderr : undefined,
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         valid: false,
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
       };
     }
   }
@@ -166,7 +166,7 @@ if __name__ == '__main__':
         if (result.error?.includes('SyntaxError') || result.error?.includes('IndentationError')) {
           return result;
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         lastError = error;
       }
 

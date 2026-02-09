@@ -4,7 +4,7 @@
 // ============================================
 
 import { BaseAgent } from './BaseAgent';
-import { AgentTask, AgentConfig } from '../types';
+import { AgentTask } from '../types';
 
 /**
  * CoordinatorAgent - Orchestrates multi-agent workflows
@@ -219,7 +219,7 @@ Provide:
 
   private extractSection(text: string, sectionName: string): string {
     const regex = new RegExp(`${sectionName}[:\\s]+(.*?)(?=\\n\\n|\\n[A-Z]|$)`, 'i');
-    const match = text.match(regex);
+    const match = regex.exec(text);
     return match ? match[1].trim() : '';
   }
 }

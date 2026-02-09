@@ -7,9 +7,9 @@ export interface AnthropicConfig {
 }
 
 export class AnthropicHelper {
-  private client: Anthropic;
-  private model: string;
-  private maxTokens: number;
+  private readonly client: Anthropic;
+  private readonly model: string;
+  private readonly maxTokens: number;
 
   constructor(config: AnthropicConfig) {
     this.client = new Anthropic({ apiKey: config.apiKey });
@@ -46,7 +46,7 @@ export class AnthropicHelper {
 
   parseJSON<T>(text: string): T | null {
     try {
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      const jsonMatch = /\{[\s\S]*\}/.exec(text);
       if (jsonMatch) {
         return JSON.parse(jsonMatch[0]);
       }

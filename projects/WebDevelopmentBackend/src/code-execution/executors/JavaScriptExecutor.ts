@@ -3,7 +3,6 @@
 // Sandboxed JavaScript Execution using VM2
 // ============================================
 
-// @ts-ignore - VM2 doesn't have official types
 import { VM } from 'vm2';
 import {
   CodeExecutionResult,
@@ -91,13 +90,14 @@ export class JavaScriptExecutor {
         executionTime,
         logs,
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       const executionTime = Date.now() - startTime;
 
-      let errorMessage = error.message;
-      if (error.message?.includes('Script execution timed out')) {
+      const rawMessage = error instanceof Error ? error.message : String(error);
+      let errorMessage = rawMessage;
+      if (rawMessage.includes('Script execution timed out')) {
         errorMessage = `Execution timeout after ${this.defaultConfig.timeout}ms`;
-      } else if (error.message?.includes('memory limit')) {
+      } else if (rawMessage.includes('memory limit')) {
         errorMessage = 'Memory limit exceeded';
       }
 
@@ -126,10 +126,10 @@ export class JavaScriptExecutor {
     try {
       new Function(code);
       return { valid: true };
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         valid: false,
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
       };
     }
   }
@@ -155,7 +155,7 @@ export class JavaScriptExecutor {
         if (result.error?.includes('SyntaxError')) {
           return result;
         }
-      } catch (error: any) {
+      } catch (error: unknown) {
         lastError = error;
       }
 

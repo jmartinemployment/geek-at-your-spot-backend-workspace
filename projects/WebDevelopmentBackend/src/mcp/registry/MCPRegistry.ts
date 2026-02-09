@@ -3,7 +3,7 @@
 // MCP Registry: Central Tool Management
 // ============================================
 
-import { PrismaClient } from '@prisma/client';
+import { logger } from '../../utils/logger';
 import {
   MCPServer,
   MCPTool,
@@ -41,7 +41,7 @@ export class MCPRegistry {
 
   async initialize(): Promise<void> {
     if (!this.config.enabled) {
-      console.log('[MCPRegistry] MCP is disabled');
+      logger.info('[MCPRegistry] MCP is disabled');
       return;
     }
 
@@ -67,9 +67,9 @@ export class MCPRegistry {
         }
       }
 
-      console.log(`[MCPRegistry] Initialized with ${this.servers.size} servers and ${this.tools.size} tools`);
+      logger.info(`[MCPRegistry] Initialized with ${this.servers.size} servers and ${this.tools.size} tools`);
     } catch (error) {
-      console.error('[MCPRegistry] Initialization failed:', error);
+      logger.error('[MCPRegistry] Initialization failed:', { error });
       throw error;
     }
   }
@@ -127,13 +127,13 @@ export class MCPRegistry {
           executionTime,
         },
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       this.stats.failedExecutions++;
       const executionTime = Date.now() - startTime;
 
       return {
         success: false,
-        error: `Tool execution failed: ${error.message}`,
+        error: `Tool execution failed: ${error instanceof Error ? error.message : String(error)}`,
         metadata: {
           executionTime,
         },
@@ -196,7 +196,7 @@ export class MCPRegistry {
     let serviceTools = 0;
     let pricingTools = 0;
 
-    for (const [toolName, { server }] of this.tools.entries()) {
+    for (const { server } of this.tools.values()) {
       if (server.name === 'ProjectKnowledgeServer') projectTools++;
       if (server.name === 'ServiceCatalogServer') serviceTools++;
       if (server.name === 'PricingServer') pricingTools++;

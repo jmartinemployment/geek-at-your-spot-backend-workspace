@@ -38,10 +38,10 @@ router.post('/jobs', async (req: Request, res: Response) => {
     });
 
     return res.status(201).json(job);
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to create job',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -74,10 +74,10 @@ router.post('/jobs/bulk', async (req: Request, res: Response) => {
       jobs: createdJobs,
       total: createdJobs.length,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to create jobs',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -114,10 +114,10 @@ router.post('/batches', async (req: Request, res: Response) => {
     });
 
     return res.status(201).json(batch);
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to create batch',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -152,10 +152,10 @@ router.get('/jobs/:jobId', (req: Request, res: Response) => {
     }
 
     return res.status(200).json(job);
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to get job',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -190,10 +190,10 @@ router.get('/jobs/:jobId/result', (req: Request, res: Response) => {
     }
 
     return res.status(200).json(result);
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to get job result',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -219,18 +219,18 @@ router.get('/jobs', (req: Request, res: Response) => {
       type: type as any,
       priority: priority as any,
       userId: userId as string,
-      limit: limit ? Number.parseInt(limit as string) : undefined,
-      offset: offset ? Number.parseInt(offset as string) : undefined,
+      limit: limit ? Number.parseInt(limit as string, 10) : undefined,
+      offset: offset ? Number.parseInt(offset as string, 10) : undefined,
     });
 
     return res.status(200).json({
       jobs,
       total: jobs.length,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to get jobs',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -265,10 +265,10 @@ router.get('/batches/:batchId', (req: Request, res: Response) => {
     }
 
     return res.status(200).json(batch);
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to get batch',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -299,10 +299,10 @@ router.post('/jobs/:jobId/cancel', (req: Request, res: Response) => {
     return res.status(200).json({
       message: 'Job cancelled successfully',
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to cancel job',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -333,10 +333,10 @@ router.post('/batches/:batchId/cancel', (req: Request, res: Response) => {
     return res.status(200).json({
       message: 'Batch cancelled successfully',
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to cancel batch',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -367,10 +367,10 @@ router.delete('/jobs/:jobId', (req: Request, res: Response) => {
     return res.status(200).json({
       message: 'Job deleted successfully',
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to delete job',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -401,10 +401,10 @@ router.post('/jobs/:jobId/retry', (req: Request, res: Response) => {
     return res.status(200).json({
       message: 'Job retry initiated',
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to retry job',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -431,10 +431,10 @@ router.post('/jobs/retry-failed', (req: Request, res: Response) => {
     });
 
     return res.status(200).json(result);
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to retry jobs',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -459,10 +459,10 @@ router.post('/cleanup', (req: Request, res: Response) => {
       message: 'Cleanup completed',
       jobsRemoved: count,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Cleanup failed',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -484,10 +484,10 @@ router.get('/statistics', (req: Request, res: Response) => {
     const stats = batchService.getJobStatistics();
 
     return res.status(200).json(stats);
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to get statistics',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -509,10 +509,10 @@ router.get('/queue/stats', (req: Request, res: Response) => {
     const stats = batchService.getQueueStatistics();
 
     return res.status(200).json(stats);
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to get queue statistics',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });
@@ -535,10 +535,10 @@ router.get('/health', async (req: Request, res: Response) => {
     const health = await batchService.healthCheck();
 
     return res.status(200).json(health);
-  } catch (error: any) {
+  } catch (error: unknown) {
     return res.status(500).json({
       error: 'Health check failed',
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 });

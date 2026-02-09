@@ -9,9 +9,6 @@ import {
   ContextMessage,
   CompressionOptions,
   CompressionResult,
-  CompressionStrategy,
-  ImportanceFactors,
-  SummarizationRequest,
   SummarizationResult,
   HierarchicalSummaryNode,
 } from '../types';
@@ -63,7 +60,7 @@ export class ContextCompressor {
       }
 
       return result;
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         success: false,
         originalTokens,
@@ -72,7 +69,7 @@ export class ContextCompressor {
         strategy: options.strategy,
         messagesRemoved: 0,
         messagesPreserved: messages.length,
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
       };
     }
   }
@@ -367,8 +364,8 @@ Provide a summary in 2-3 paragraphs.`;
     });
 
     const summary = response.content
-      .filter((block: any) => block.type === 'text')
-      .map((block: any) => block.text)
+      .filter((block): block is Anthropic.TextBlock => block.type === 'text')
+      .map((block) => block.text)
       .join('\n');
 
     const originalTokenCount = messages.reduce((sum, msg) => sum + msg.tokenCount, 0);
@@ -388,7 +385,7 @@ Provide a summary in 2-3 paragraphs.`;
    */
   private async buildHierarchicalSummary(
     messages: ContextMessage[],
-    targetTokens: number
+    _targetTokens: number
   ): Promise<HierarchicalSummaryNode> {
     const chunkSize = 10; // Messages per chunk
 
@@ -461,7 +458,7 @@ Provide a summary in 2-3 paragraphs.`;
     for (const line of lines) {
       const trimmed = line.trim();
       if ((/^[-•*]\s+/.exec(trimmed)) || (/^\d+\.\s+/.exec(trimmed))) {
-        keyPoints.push(trimmed.replace(/^[-•*]\s+/, '').replace(/^\d+\.\s+/, ''));
+        keyPoints.push(trimmed.replaceAll(/^[-•*]\s+/g, '').replaceAll(/^\d+\.\s+/g, ''));
       }
     }
 

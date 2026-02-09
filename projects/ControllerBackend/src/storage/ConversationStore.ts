@@ -1,4 +1,5 @@
 import { ConversationContext, Message, ConversationPhase } from '../types/conversation';
+import { logger } from '../utils/logger';
 
 export class ConversationStore {
   private readonly conversations: Map<string, ConversationContext> = new Map();
@@ -46,7 +47,7 @@ export class ConversationStore {
     if (context) {
       context.metadata.phase = phase;
       context.metadata.updatedAt = new Date();
-      console.log(`[ConversationStore] ${conversationId} phase: ${phase}`);
+      logger.info('Conversation phase updated', { conversationId, phase });
     }
   }
 

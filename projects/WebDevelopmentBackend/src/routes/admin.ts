@@ -8,6 +8,7 @@ import { PrismaClient } from '@prisma/client';
 import { LeadRepository } from '../repositories/LeadRepository';
 import { ConversationRepository } from '../repositories/ConversationRepository';
 import { checkApiKey, checkIPWhitelist } from '../middleware/security';
+import { logger } from '../utils/logger';
 
 const router = Router();
 const prisma = new PrismaClient();
@@ -36,13 +37,13 @@ router.get('/leads', async (req: Request, res: Response): Promise<void> => {
       status: status as any,
       source: source as string,
       search: search as string,
-      skip: Number.parseInt(skip as string),
-      take: Number.parseInt(take as string)
+      skip: Number.parseInt(skip as string, 10),
+      take: Number.parseInt(take as string, 10)
     });
 
     res.json(result);
   } catch (error) {
-    console.error('Error fetching leads:', error);
+    logger.error('Error fetching leads:', { error });
     res.status(500).json({
       error: 'Failed to fetch leads',
       code: 'FETCH_ERROR'
@@ -56,7 +57,7 @@ router.get('/leads', async (req: Request, res: Response): Promise<void> => {
  */
 router.get('/leads/:id', async (req: Request, res: Response): Promise<void> => {
   try {
-    const leadId = Number.parseInt(req.params.id);
+    const leadId = Number.parseInt(req.params.id, 10);
     const lead = await leadRepo.findById(leadId);
 
     if (!lead) {
@@ -69,7 +70,7 @@ router.get('/leads/:id', async (req: Request, res: Response): Promise<void> => {
 
     res.json(lead);
   } catch (error) {
-    console.error('Error fetching lead:', error);
+    logger.error('Error fetching lead:', { error });
     res.status(500).json({
       error: 'Failed to fetch lead',
       code: 'FETCH_ERROR'
@@ -83,7 +84,7 @@ router.get('/leads/:id', async (req: Request, res: Response): Promise<void> => {
  */
 router.patch('/leads/:id/status', async (req: Request, res: Response): Promise<void> => {
   try {
-    const leadId = Number.parseInt(req.params.id);
+    const leadId = Number.parseInt(req.params.id, 10);
     const { status } = req.body;
 
     if (!status) {
@@ -97,7 +98,7 @@ router.patch('/leads/:id/status', async (req: Request, res: Response): Promise<v
     const lead = await leadRepo.updateStatus(leadId, status);
     res.json(lead);
   } catch (error) {
-    console.error('Error updating lead status:', error);
+    logger.error('Error updating lead status:', { error });
     res.status(500).json({
       error: 'Failed to update lead status',
       code: 'UPDATE_ERROR'
@@ -130,7 +131,7 @@ router.get('/stats', async (req: Request, res: Response): Promise<void> => {
       totalTokens
     });
   } catch (error) {
-    console.error('Error fetching stats:', error);
+    logger.error('Error fetching stats:', { error });
     res.status(500).json({
       error: 'Failed to fetch statistics',
       code: 'FETCH_ERROR'
@@ -144,12 +145,12 @@ router.get('/stats', async (req: Request, res: Response): Promise<void> => {
  */
 router.get('/conversations/:leadId', async (req: Request, res: Response): Promise<void> => {
   try {
-    const leadId = Number.parseInt(req.params.leadId);
+    const leadId = Number.parseInt(req.params.leadId, 10);
     const conversations = await conversationRepo.findByLeadId(leadId);
 
     res.json(conversations);
   } catch (error) {
-    console.error('Error fetching conversations:', error);
+    logger.error('Error fetching conversations:', { error });
     res.status(500).json({
       error: 'Failed to fetch conversations',
       code: 'FETCH_ERROR'
@@ -163,7 +164,7 @@ router.get('/conversations/:leadId', async (req: Request, res: Response): Promis
  */
 router.delete('/leads/:id', async (req: Request, res: Response): Promise<void> => {
   try {
-    const leadId = Number.parseInt(req.params.id);
+    const leadId = Number.parseInt(req.params.id, 10);
     const lead = await leadRepo.softDelete(leadId);
 
     res.json({
@@ -171,7 +172,7 @@ router.delete('/leads/:id', async (req: Request, res: Response): Promise<void> =
       lead
     });
   } catch (error) {
-    console.error('Error deleting lead:', error);
+    logger.error('Error deleting lead:', { error });
     res.status(500).json({
       error: 'Failed to delete lead',
       code: 'DELETE_ERROR'

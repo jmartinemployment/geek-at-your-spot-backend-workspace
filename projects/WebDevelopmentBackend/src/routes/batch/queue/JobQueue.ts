@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck - Module excluded from tsconfig (batch types not in project scope)
 // ============================================
 // src/batch/queue/JobQueue.ts
 // Job Queue - Priority-based job queue management
@@ -7,9 +7,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import {
   Job,
-  JobStatus,
   JobPriority,
-  JobType,
   CreateJobOptions,
   JobUpdate,
   QueueConfig,

@@ -10,11 +10,8 @@ import {
   OrchestrationRequest,
   OrchestrationResult,
   OrchestrationStrategy,
-  CollaborationPattern,
+  ConversationContext,
   AgentTask,
-  AgentMessage,
-  MessagePriority,
-  DelegationDecision,
   AgentResponse,
 } from '../types';
 
@@ -148,7 +145,7 @@ export class Orchestrator {
         totalDuration,
         conversation: this.conversationManager.getConversation(conversation.id)!,
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       const totalDuration = Date.now() - startTime;
 
       return {
@@ -158,8 +155,8 @@ export class Orchestrator {
         agentsInvolved: [],
         tasksCompleted: 0,
         totalDuration,
-        conversation: null as any,
-        error: error.message,
+        conversation: null as unknown as ConversationContext,
+        error: error instanceof Error ? error.message : String(error),
       };
     }
   }
@@ -171,7 +168,7 @@ export class Orchestrator {
     conversationId: string,
     coordinator: BaseAgent,
     initialResponse: AgentResponse,
-    request: OrchestrationRequest
+    _request: OrchestrationRequest
   ): Promise<any> {
     const results: any[] = [];
     let currentAgent = coordinator;
@@ -183,7 +180,7 @@ export class Orchestrator {
       if (currentResponse.delegateTo) {
         const nextAgent = this.agentRegistry.getAgent(currentResponse.delegateTo.agentId);
 
-        if (nextAgent && nextAgent.isAvailable()) {
+        if (nextAgent?.isAvailable()) {
           // Create task
           const task = this.conversationManager.addTask(
             conversationId,
@@ -290,10 +287,11 @@ export class Orchestrator {
         this.conversationManager.updateTaskStatus(conversationId, task.id, 'completed', result);
 
         return { success: true, task: taskDesc, result };
-      } catch (error: any) {
-        this.conversationManager.updateTaskStatus(conversationId, task.id, 'failed', null, error.message);
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        this.conversationManager.updateTaskStatus(conversationId, task.id, 'failed', null, errorMessage);
 
-        return { success: false, task: taskDesc, error: error.message };
+        return { success: false, task: taskDesc, error: errorMessage };
       }
     });
 
@@ -314,7 +312,7 @@ export class Orchestrator {
     conversationId: string,
     coordinator: BaseAgent,
     initialResponse: AgentResponse,
-    request: OrchestrationRequest
+    _request: OrchestrationRequest
   ): Promise<any> {
     const results: any[] = [];
     const queue: Array<{ agent: BaseAgent; response: AgentResponse }> = [
@@ -328,7 +326,7 @@ export class Orchestrator {
       if (response.delegateTo) {
         const delegateAgent = this.agentRegistry.getAgent(response.delegateTo.agentId);
 
-        if (delegateAgent && delegateAgent.isAvailable()) {
+        if (delegateAgent?.isAvailable()) {
           const task = this.conversationManager.addTask(
             conversationId,
             delegateAgent.getConfig().id,
@@ -397,7 +395,7 @@ export class Orchestrator {
     conversationId: string,
     coordinator: BaseAgent,
     initialResponse: AgentResponse,
-    request: OrchestrationRequest
+    _request: OrchestrationRequest
   ): Promise<any> {
     const tasks = this.identifyParallelTasks(initialResponse);
     const availableAgents = this.agentRegistry.getAvailableAgents();
@@ -433,15 +431,16 @@ export class Orchestrator {
         results.push({ success: true, task: taskDesc, result });
 
         this.conversationManager.updateTaskStatus(conversationId, task.id, 'completed', result);
-      } catch (error: any) {
-        results.push({ success: false, task: taskDesc, error: error.message });
+      } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        results.push({ success: false, task: taskDesc, error: errorMessage });
 
         this.conversationManager.updateTaskStatus(
           conversationId,
           task.id,
           'failed',
           null,
-          error.message
+          errorMessage
         );
       }
 
@@ -474,7 +473,7 @@ export class Orchestrator {
   /**
    * Get coordinator agent
    */
-  private getCoordinatorAgent(request: OrchestrationRequest): BaseAgent | undefined {
+  private getCoordinatorAgent(_request: OrchestrationRequest): BaseAgent | undefined {
     // Try to get a coordinator agent
     const coordinators = this.agentRegistry.getAgentsByRole('coordinator');
 
@@ -509,7 +508,7 @@ export class Orchestrator {
     for (const line of lines) {
       const trimmed = line.trim();
       if ((/^[-•*]\s+/.exec(trimmed)) || (/^\d+\.\s+/.exec(trimmed))) {
-        const task = trimmed.replace(/^[-•*]\s+/, '').replace(/^\d+\.\s+/, '');
+        const task = trimmed.replaceAll(/^[-•*]\s+/g, '').replaceAll(/^\d+\.\s+/g, '');
         if (task.length > 10) {
           // Minimum task length
           tasks.push(task);

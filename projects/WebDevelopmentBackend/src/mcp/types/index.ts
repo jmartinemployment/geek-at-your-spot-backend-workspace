@@ -29,6 +29,7 @@ export interface MCPToolResult {
     executionTime?: number;
     cached?: boolean;
     source?: string;
+    [key: string]: unknown;
   };
 }
 

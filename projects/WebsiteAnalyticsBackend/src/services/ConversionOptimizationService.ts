@@ -56,7 +56,7 @@ Format as JSON with keys: currentPerformance, optimizations (array), projectedIm
 
   private parseConversionResponse(text: string): ConversionResult {
     try {
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      const jsonMatch = /\{[\s\S]*\}/.exec(text);
       if (jsonMatch) {
         return JSON.parse(jsonMatch[0]);
       }

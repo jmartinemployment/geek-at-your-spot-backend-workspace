@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { ContentService } from './services/ContentService';
 import { SEOService } from './services/SEOService';
+import { logger } from './utils/logger';
 
 dotenv.config();
 
@@ -15,7 +16,7 @@ app.use(express.json());
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY || '';
 
 if (!ANTHROPIC_API_KEY) {
-  console.error('Error: ANTHROPIC_API_KEY is required');
+  logger.error('ANTHROPIC_API_KEY is required');
   process.exit(1);
 }
 
@@ -49,11 +50,11 @@ app.post('/api/marketing/content', async (req: Request, res: Response) => {
   try {
     const result = await contentService.generateContent(req.body);
     res.json(result);
-  } catch (error: any) {
-    console.error('Content generation error:', error);
-    res.status(500).json({ 
+  } catch (error: unknown) {
+    logger.error('Content generation error', { error });
+    res.status(500).json({
       error: 'Content generation failed',
-      message: error.message 
+      message: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -63,21 +64,21 @@ app.post('/api/marketing/seo', async (req: Request, res: Response) => {
   try {
     const result = await seoService.analyzeSEO(req.body);
     res.json(result);
-  } catch (error: any) {
-    console.error('SEO analysis error:', error);
-    res.status(500).json({ 
+  } catch (error: unknown) {
+    logger.error('SEO analysis error', { error });
+    res.status(500).json({
       error: 'SEO analysis failed',
-      message: error.message 
+      message: error instanceof Error ? error.message : String(error)
     });
   }
 });
 
 app.listen(Number(port), '0.0.0.0', () => {
-  console.log(`\n===========================================`);
-  console.log(`📣 Marketing Backend on port ${port}`);
-  console.log(`===========================================`);
-  console.log(`📡 Health: http://localhost:${port}/health`);
-  console.log(`✍️  Content: http://localhost:${port}/api/marketing/content`);
-  console.log(`🔍 SEO: http://localhost:${port}/api/marketing/seo`);
-  console.log(`===========================================\n`);
+  logger.info(`Marketing Backend started on port ${port}`, {
+    endpoints: {
+      health: `http://localhost:${port}/health`,
+      content: `http://localhost:${port}/api/marketing/content`,
+      seo: `http://localhost:${port}/api/marketing/seo`
+    }
+  });
 });

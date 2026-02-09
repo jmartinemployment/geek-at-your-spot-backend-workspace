@@ -1,4 +1,3 @@
-// @ts-nocheck
 // ============================================
 // src/mcp/servers/PricingServer.ts
 // MCP Server: Cost Estimation & Budget Optimization
@@ -251,7 +250,7 @@ export class PricingServer implements MCPServer {
     this.handlers.set('suggest_cost_optimizations', this.suggestCostOptimizations.bind(this));
   }
 
-  async initialize(context: MCPExecutionContext): Promise<void> {
+  async initialize(_context: MCPExecutionContext): Promise<void> {
     // No initialization needed
   }
 
@@ -264,7 +263,7 @@ export class PricingServer implements MCPServer {
     _context: MCPExecutionContext
   ): Promise<MCPToolResult> {
     try {
-      const { project_type, features, complexity = 'medium', timeline_weeks, team_size } = params;
+      const { project_type, features, complexity = 'medium', team_size } = params;
 
       const breakdown = features.map((featureId) => {
         const feature = this.featurePricing[featureId];
@@ -338,10 +337,10 @@ export class PricingServer implements MCPServer {
           total_hours: totalHours,
         },
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         success: false,
-        error: `Failed to estimate cost: ${error.message}`,
+        error: `Failed to estimate cost: ${error instanceof Error ? error.message : String(error)}`,
       };
     }
   }
@@ -393,10 +392,10 @@ export class PricingServer implements MCPServer {
           total_features: features.length,
         },
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         success: false,
-        error: `Failed to get feature pricing: ${error.message}`,
+        error: `Failed to get feature pricing: ${error instanceof Error ? error.message : String(error)}`,
       };
     }
   }
@@ -478,10 +477,10 @@ export class PricingServer implements MCPServer {
           project_type,
         },
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         success: false,
-        error: `Failed to compare pricing: ${error.message}`,
+        error: `Failed to compare pricing: ${error instanceof Error ? error.message : String(error)}`,
       };
     }
   }
@@ -566,10 +565,10 @@ export class PricingServer implements MCPServer {
           required_cost: requiredCost,
         },
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         success: false,
-        error: `Failed to optimize budget: ${error.message}`,
+        error: `Failed to optimize budget: ${error instanceof Error ? error.message : String(error)}`,
       };
     }
   }

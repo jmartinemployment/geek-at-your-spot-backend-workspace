@@ -1,4 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
+import { logger } from '../utils/logger';
 
 export interface EstimateResult {
   summary: string;
@@ -102,7 +103,7 @@ Respond with ONLY valid JSON:
       };
 
     } catch (error) {
-      console.error('Failed to parse estimate:', error);
+      logger.error('Failed to parse estimate', { error });
       
       return {
         summary: 'Custom project estimate based on your requirements',

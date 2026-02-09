@@ -7,6 +7,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
+import { logger } from './utils/logger';
 
 // Import MCP ONLY
 import { getMCPRegistry, MCPClient } from './mcp';
@@ -41,14 +42,14 @@ let mcpRegistry: any;
 let mcpClient: any;
 
 async function initializeServices() {
-  console.log('[Server] Initializing services...');
+  logger.info('[Server] Initializing services...');
 
   // ============================================
   // MCP INITIALIZATION
   // ============================================
   if (MCP_ENABLED) {
     try {
-      console.log('[Server] Initializing MCP...');
+      logger.info('[Server] Initializing MCP...');
 
       mcpRegistry = await getMCPRegistry({
         prisma: prisma,
@@ -61,23 +62,23 @@ async function initializeServices() {
           model: process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-20250514',
           maxTokens: 4096,
         });
-        console.log('[Server] MCP Client initialized');
+        logger.info('[Server] MCP Client initialized');
       }
 
-      console.log('[Server] MCP initialized successfully');
+      logger.info('[Server] MCP initialized successfully');
     } catch (error) {
-      console.error('[Server] MCP initialization failed:', error);
-      console.log('[Server] Continuing without MCP...');
+      logger.error('[Server] MCP initialization failed:', { error });
+      logger.info('[Server] Continuing without MCP...');
     }
   } else {
-    console.log('[Server] MCP is disabled');
+    logger.info('[Server] MCP is disabled');
   }
 
   // Make services available to routes
   app.locals.mcpRegistry = mcpRegistry;
   app.locals.mcpClient = mcpClient;
 
-  console.log('[Server] All services initialized');
+  logger.info('[Server] All services initialized');
 }
 
 // ============================================
@@ -149,12 +150,12 @@ app.get('/', (_req, res) => {
 // ============================================
 
 async function gracefulShutdown(signal: string) {
-  console.log(`\n[Server] ${signal} received, shutting down gracefully...`);
+  logger.info(`[Server] ${signal} received, shutting down gracefully...`);
 
   // Close Prisma connection
   await prisma.$disconnect();
 
-  console.log('[Server] Shutdown complete');
+  logger.info('[Server] Shutdown complete');
   process.exit(0);
 }
 
@@ -173,15 +174,15 @@ async function startServer() {
 
     // Start Express server
     app.listen(port, () => {
-      console.log(`\n===========================================`);
-      console.log(`🚀 GeekQuote Backend running on port ${port}`);
-      console.log(`===========================================`);
-      console.log(`📡 Health: http://localhost:${port}/health`);
-      console.log(`🤖 MCP API: http://localhost:${port}/api/mcp`);
-      console.log(`===========================================\n`);
+      logger.info('===========================================');
+      logger.info(`GeekQuote Backend running on port ${port}`);
+      logger.info('===========================================');
+      logger.info(`Health: http://localhost:${port}/health`);
+      logger.info(`MCP API: http://localhost:${port}/api/mcp`);
+      logger.info('===========================================');
     });
   } catch (error) {
-    console.error('[Server] Failed to start:', error);
+    logger.error('[Server] Failed to start:', { error });
     process.exit(1);
   }
 }

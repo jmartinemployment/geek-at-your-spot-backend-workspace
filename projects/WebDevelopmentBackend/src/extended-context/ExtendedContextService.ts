@@ -3,6 +3,7 @@
 // Extended Context Service - Main orchestrator for context management
 // ============================================
 
+import { logger } from '../utils/logger';
 import { ContextWindowManager } from './manager/ContextWindowManager';
 import { ContextCompressor } from './compression/ContextCompressor';
 import { TokenCounter } from './utils/TokenCounter';
@@ -78,7 +79,7 @@ export class ExtendedContextService {
     }
 
     this.initialized = true;
-    console.log('[Extended Context] Service initialized');
+    logger.info('[Extended Context] Service initialized');
   }
 
   /**

@@ -5,6 +5,7 @@
 
 import Anthropic from '@anthropic-ai/sdk';
 import { ChatMessage, QuoteEstimate } from '../types';
+import { logger } from '../utils/logger';
 
 export class ClaudeService {
   private readonly client: Anthropic;
@@ -133,7 +134,7 @@ Be conversational, not robotic. Show genuine interest in helping them succeed.`;
       };
 
     } catch (error) {
-      console.error('Claude API error:', error);
+      logger.error('Claude API error:', { error });
       throw new Error('Failed to get AI response');
     }
   }

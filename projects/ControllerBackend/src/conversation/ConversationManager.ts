@@ -6,6 +6,7 @@ import { EstimateGenerator, EstimateResult } from '../estimation/EstimateGenerat
 import { getRequiredFields } from '../requirements/RequirementsSchema';
 import { ConversationContext, Message, ConversationPhase } from '../types/conversation';
 import { v4 as uuidv4 } from 'uuid';
+import { logger } from '../utils/logger';
 
 export interface ChatRequest {
   conversationId?: string;
@@ -41,7 +42,7 @@ export class ConversationManager {
     setInterval(() => {
       const cleaned = this.store.cleanup();
       if (cleaned > 0) {
-        console.log(`[ConversationManager] Cleaned up ${cleaned} old conversations`);
+        logger.info('Cleaned up old conversations', { cleaned });
       }
     }, 60 * 60 * 1000);
   }
@@ -128,7 +129,7 @@ export class ConversationManager {
       readinessScore: extracted.readinessScore
     });
 
-    console.log(`[Gathering] Readiness: ${extracted.readinessScore}%, Missing: ${extracted.missingRequired.join(', ')}`);
+    logger.info('Gathering phase status', { readiness: extracted.readinessScore, missing: extracted.missingRequired });
 
     if (extracted.completionReady) {
       const confirmationText = await this.generateConfirmationSummary(serviceType, extracted.data);
@@ -417,7 +418,7 @@ Respond ONLY with JSON:
         clarificationNeeded: parsed.clarificationNeeded || ''
       };
     } catch (error) {
-      console.error('Failed to parse confirmation analysis:', error);
+      logger.error('Failed to parse confirmation analysis', { error });
       return {
         agreed: false,
         needsDiscussion: false,

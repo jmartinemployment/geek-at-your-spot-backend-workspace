@@ -1,4 +1,3 @@
-// @ts-nocheck
 // ============================================
 // src/mcp/client/MCPClient.ts
 // MCP Client: Claude API Integration with Tools
@@ -82,15 +81,15 @@ export class MCPClient {
 
         // Check if Claude wants to use tools
         const toolUseBlocks = response.content.filter(
-          (block: any) => block.type === 'tool_use'
+          (block): block is Anthropic.ToolUseBlock => block.type === 'tool_use'
         );
 
         if (toolUseBlocks.length === 0) {
           // No more tool uses, return final response
           const textBlocks = response.content.filter(
-            (block: any) => block.type === 'text'
+            (block): block is Anthropic.TextBlock => block.type === 'text'
           );
-          const finalContent = textBlocks.map((block: any) => block.text).join('\n');
+          const finalContent = textBlocks.map((block) => block.text).join('\n');
 
           return {
             content: finalContent,
@@ -145,8 +144,8 @@ export class MCPClient {
           outputTokens: 0,
         },
       };
-    } catch (error: any) {
-      throw new Error(`Chat failed: ${error.message}`);
+    } catch (error: unknown) {
+      throw new Error(`Chat failed: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -172,11 +171,11 @@ export class MCPClient {
       });
 
       const textBlocks = response.content.filter(
-        (block: any) => block.type === 'text'
+        (block): block is Anthropic.TextBlock => block.type === 'text'
       );
-      return textBlocks.map((block: any) => block.text).join('\n');
-    } catch (error: any) {
-      throw new Error(`Simple chat failed: ${error.message}`);
+      return textBlocks.map((block) => block.text).join('\n');
+    } catch (error: unknown) {
+      throw new Error(`Simple chat failed: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 

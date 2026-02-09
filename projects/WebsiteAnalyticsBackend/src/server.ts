@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { TrafficAnalysisService } from './services/TrafficAnalysisService';
 import { ConversionOptimizationService } from './services/ConversionOptimizationService';
+import { logger } from './utils/logger';
 
 dotenv.config();
 
@@ -15,7 +16,7 @@ app.use(express.json());
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY || '';
 
 if (!ANTHROPIC_API_KEY) {
-  console.error('Error: ANTHROPIC_API_KEY is required');
+  logger.error('ANTHROPIC_API_KEY is required');
   process.exit(1);
 }
 
@@ -40,8 +41,8 @@ app.post('/api/analytics/traffic', async (req: Request, res: Response) => {
   try {
     const result = await trafficService.analyzeTraffic(req.body);
     res.json(result);
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
+  } catch (error: unknown) {
+    res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
   }
 });
 
@@ -49,11 +50,11 @@ app.post('/api/analytics/conversion', async (req: Request, res: Response) => {
   try {
     const result = await conversionService.analyzeConversion(req.body);
     res.json(result);
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
+  } catch (error: unknown) {
+    res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
   }
 });
 
 app.listen(Number(port), '0.0.0.0', () => {
-  console.log(`\n📈 Website Analytics Backend on port ${port}\n`);
+  logger.info(`Website Analytics Backend started on port ${port}`);
 });

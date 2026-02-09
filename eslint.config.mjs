@@ -14,6 +14,8 @@ export default tseslint.config(
     rules: {
       // Relax recommended rules for existing codebase
       '@typescript-eslint/no-explicit-any': 'off',
+      // Allow @ts-nocheck only with a description explaining why
+      '@typescript-eslint/ban-ts-comment': ['error', { 'ts-nocheck': 'allow-with-description' }],
       '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_', caughtErrors: 'none' }],
 
       // Prefer modern APIs
@@ -38,6 +40,16 @@ export default tseslint.config(
     },
   },
   {
-    ignores: ['**/dist/**', '**/node_modules/**', '**/*.js', '**/*.mjs'],
+    ignores: [
+      '**/dist/**',
+      '**/node_modules/**',
+      '**/*.js',
+      '**/*.mjs',
+      '**/routes/batch/index.ts',
+      '**/routes/batch/routes/**',
+      '**/routes/extended-context.ts',
+      '**/test-db.ts',
+      '**/test*.ts',
+    ],
   },
 );

@@ -1,6 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { Message } from '../types/conversation';
 import { getAllFields } from './RequirementsSchema';
+import { logger } from '../utils/logger';
 
 export interface ExtractedRequirements {
   data: Record<string, any>;
@@ -84,7 +85,6 @@ Respond ONLY with valid JSON in this format:
 
       const parsed = JSON.parse(jsonMatch[0]);
       const extractedData = parsed.extracted || {};
-      const confidence = parsed.confidence || 0;
 
       // Determine which required fields are missing
       const missingRequired = requiredFields
@@ -109,7 +109,7 @@ Respond ONLY with valid JSON in this format:
       };
 
     } catch (error) {
-      console.error('Failed to parse extraction:', error);
+      logger.error('Failed to parse extraction', { error });
       return {
         data: {},
         missingRequired: requiredFields.map(f => f.key),

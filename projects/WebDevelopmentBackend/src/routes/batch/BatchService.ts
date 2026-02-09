@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck - Module excluded from tsconfig (batch types not in project scope)
 // ============================================
 // src/batch/BatchService.ts
 // Batch Service - Main orchestrator for batch processing
@@ -6,6 +6,7 @@
 
 import { JobQueue } from './queue/JobQueue';
 import { JobProcessor, DefaultProcessors } from './processor/JobProcessor';
+import { logger } from '../../utils/logger';
 import {
   BatchConfig,
   Job,
@@ -13,7 +14,6 @@ import {
   JobFilterOptions,
   JobStatistics,
   JobType,
-  JobStatus,
   JobPriority,
   BatchJob,
   CreateBatchOptions,
@@ -22,7 +22,6 @@ import {
   QueueHealth,
   JobEvent,
   JobEventType,
-  ProcessorRegistryEntry,
   BulkOperationResult,
 } from './types';
 
@@ -74,7 +73,7 @@ export class BatchService {
     this.processor.start(1000);
 
     this.initialized = true;
-    console.log('[Batch Service] Initialized');
+    logger.info('[Batch Service] Initialized');
   }
 
   /**
@@ -91,7 +90,7 @@ export class BatchService {
 
     const job = this.queue.createJob(options);
 
-    console.log(`[Batch Service] Created job ${job.id} (${job.type})`);
+    logger.info(`[Batch Service] Created job ${job.id} (${job.type})`);
 
     return job;
   }
@@ -145,7 +144,7 @@ export class BatchService {
 
     this.batches.set(batch.id, batch);
 
-    console.log(`[Batch Service] Created batch ${batch.id} with ${jobs.length} jobs`);
+    logger.info(`[Batch Service] Created batch ${batch.id} with ${jobs.length} jobs`);
 
     return batch;
   }
@@ -211,7 +210,7 @@ export class BatchService {
    */
   cancelJob(jobId: string): void {
     this.processor.cancelJob(jobId);
-    console.log(`[Batch Service] Cancelled job ${jobId}`);
+    logger.info(`[Batch Service] Cancelled job ${jobId}`);
   }
 
   /**
@@ -234,7 +233,7 @@ export class BatchService {
     }
 
     batch.status = 'cancelled';
-    console.log(`[Batch Service] Cancelled batch ${batchId}`);
+    logger.info(`[Batch Service] Cancelled batch ${batchId}`);
   }
 
   /**
@@ -356,8 +355,8 @@ export class BatchService {
       retrying: 0,
     };
 
-    const byType: Record<JobType, number> = {} as any;
-    const byPriority: Record<JobPriority, number> = {} as any;
+    const byType: Partial<Record<JobType, number>> = {};
+    const byPriority: Partial<Record<JobPriority, number>> = {};
 
     let totalProcessingTime = 0;
     let processedCount = 0;
@@ -503,8 +502,8 @@ export class BatchService {
       try {
         this.retryJob(job.id);
         results.push({ jobId: job.id, success: true });
-      } catch (error: any) {
-        results.push({ jobId: job.id, success: false, error: error.message });
+      } catch (error: unknown) {
+        results.push({ jobId: job.id, success: false, error: error instanceof Error ? error.message : String(error) });
       }
     }
 
@@ -537,7 +536,7 @@ export class BatchService {
    * Shutdown service
    */
   async shutdown(): Promise<void> {
-    console.log('[Batch Service] Shutting down...');
+    logger.info('[Batch Service] Shutting down...');
 
     this.processor.stop();
 
@@ -547,7 +546,7 @@ export class BatchService {
 
     while (this.queue.getProcessingCount() > 0) {
       if (Date.now() - startTime > timeout) {
-        console.warn('[Batch Service] Shutdown timeout, some jobs may not have completed');
+        logger.warn('[Batch Service] Shutdown timeout, some jobs may not have completed');
         break;
       }
 
@@ -555,7 +554,7 @@ export class BatchService {
     }
 
     this.initialized = false;
-    console.log('[Batch Service] Shutdown complete');
+    logger.info('[Batch Service] Shutdown complete');
   }
 
   /**

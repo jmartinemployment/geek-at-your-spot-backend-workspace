@@ -2,7 +2,7 @@
 // src/repositories/ConversationRepository.ts
 // ============================================
 
-import { PrismaClient, Conversation } from '@prisma/client';
+import { PrismaClient, Prisma, Conversation } from '@prisma/client';
 import { ChatMessage } from '../types';
 
 export class ConversationRepository {
@@ -25,7 +25,7 @@ export class ConversationRepository {
     return await this.prisma.conversation.create({
       data: {
         leadId: data.leadId,
-        messages: data.messages as any, // Prisma Json type
+        messages: data.messages as unknown as Prisma.InputJsonValue,
         aiModel: data.aiModel || 'claude-sonnet-4',
         tokenCount: data.tokenCount,
         cost: data.cost
@@ -84,7 +84,7 @@ async appendMessages(
   return await this.prisma.conversation.update({
     where: { id },
     data: {
-      messages: updatedMessages as any
+      messages: updatedMessages as unknown as Prisma.InputJsonValue
     }
   });
 }

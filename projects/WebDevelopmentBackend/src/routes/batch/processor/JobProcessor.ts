@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck - Module excluded from tsconfig (batch types not in project scope)
 // ============================================
 // src/batch/processor/JobProcessor.ts
 // Job Processor - Executes jobs in the background
@@ -13,6 +13,7 @@ import {
   ProcessorRegistryEntry,
 } from '../types';
 import { JobQueue } from '../queue/JobQueue';
+import { logger } from '../../../utils/logger';
 
 export class JobProcessor {
   private readonly queue: JobQueue;
@@ -51,7 +52,7 @@ export class JobProcessor {
     }
 
     this.isRunning = true;
-    console.log('[JobProcessor] Started');
+    logger.info('[JobProcessor] Started');
 
     this.processingLoop = setInterval(() => {
       this.processNextJob();
@@ -73,7 +74,7 @@ export class JobProcessor {
       this.processingLoop = null;
     }
 
-    console.log('[JobProcessor] Stopped');
+    logger.info('[JobProcessor] Stopped');
   }
 
   /**
@@ -121,7 +122,7 @@ export class JobProcessor {
         this.emitEvent('job_progress', job.id, { progress });
       },
       log: (message: string, level: 'info' | 'warn' | 'error' = 'info') => {
-        console.log(`[Job ${job.id}] [${level.toUpperCase()}] ${message}`);
+        logger.log(level, `[Job ${job.id}] ${message}`);
       },
       isCancelled: () => {
         return this.cancellationSignals.get(job.id) || false;
@@ -162,9 +163,9 @@ export class JobProcessor {
       });
 
       this.emitEvent('job_completed', job.id, { result });
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Job failed
-      const errorMessage = error.message || 'Unknown error';
+      const errorMessage = error instanceof Error ? error.message : String(error);
 
       this.queue.updateJob(job.id, {
         status: 'failed',
@@ -215,7 +216,7 @@ export class JobProcessor {
       try {
         listener(event);
       } catch (error) {
-        console.error('[JobProcessor] Event listener error:', error);
+        logger.error('[JobProcessor] Event listener error:', { error });
       }
     }
 
@@ -225,7 +226,7 @@ export class JobProcessor {
       try {
         listener(event);
       } catch (error) {
-        console.error('[JobProcessor] Event listener error:', error);
+        logger.error('[JobProcessor] Event listener error:', { error });
       }
     }
   }
@@ -307,7 +308,7 @@ export class DefaultProcessors {
   static codeExecution: JobProcessorFn = async (job, context) => {
     context.log('Starting code execution');
 
-    const { language, code, input } = job.data;
+    const { language } = job.data;
 
     // Import code execution service
     // This would integrate with your CodeExecutionService
@@ -329,10 +330,8 @@ export class DefaultProcessors {
   /**
    * Cost calculation processor
    */
-  static costCalculation: JobProcessorFn = async (job, context) => {
+  static costCalculation: JobProcessorFn = async (_job, context) => {
     context.log('Starting cost calculation');
-
-    const { projectType, features, complexity } = job.data;
 
     // Import cost calculator
     // This would integrate with your CostCalculator
@@ -353,10 +352,8 @@ export class DefaultProcessors {
   /**
    * Timeline generation processor
    */
-  static timelineGeneration: JobProcessorFn = async (job, context) => {
+  static timelineGeneration: JobProcessorFn = async (_job, context) => {
     context.log('Generating timeline');
-
-    const { phases, teamSize } = job.data;
 
     context.updateProgress(50);
 
@@ -375,10 +372,8 @@ export class DefaultProcessors {
   /**
    * Feasibility check processor
    */
-  static feasibilityCheck: JobProcessorFn = async (job, context) => {
+  static feasibilityCheck: JobProcessorFn = async (_job, context) => {
     context.log('Checking feasibility');
-
-    const { projectType, features, technologies } = job.data;
 
     context.updateProgress(50);
 
@@ -401,7 +396,7 @@ export class DefaultProcessors {
   static a2aWorkflow: JobProcessorFn = async (job, context) => {
     context.log('Starting A2A workflow');
 
-    const { goal, agents } = job.data;
+    const { agents } = job.data;
 
     context.updateProgress(25);
 
@@ -430,7 +425,7 @@ export class DefaultProcessors {
   static contextCompression: JobProcessorFn = async (job, context) => {
     context.log('Starting context compression');
 
-    const { conversationId, strategy } = job.data;
+    void job.data;
 
     context.updateProgress(50);
 
@@ -485,7 +480,7 @@ export class DefaultProcessors {
   static reportGeneration: JobProcessorFn = async (job, context) => {
     context.log('Generating report');
 
-    const { reportType, data } = job.data;
+    const { reportType } = job.data;
 
     context.updateProgress(30);
 
@@ -511,7 +506,7 @@ export class DefaultProcessors {
   static dataExport: JobProcessorFn = async (job, context) => {
     context.log('Exporting data');
 
-    const { format, filters } = job.data;
+    const { format } = job.data;
 
     context.updateProgress(50);
 

@@ -1,8 +1,10 @@
 // backend/src/a2a/orchestration/OrchestrationService.ts
+import { logger } from '../../utils/logger';
+
 export class OrchestrationService {
-  constructor(config: any) {
+  constructor(_config: any) {
     // Placeholder for Phase 3
-    console.log('OrchestrationService initialized (placeholder)');
+    logger.info('OrchestrationService initialized (placeholder)');
   }
 
   getAgentStats() {

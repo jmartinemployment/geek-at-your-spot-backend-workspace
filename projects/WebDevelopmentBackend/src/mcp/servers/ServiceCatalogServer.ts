@@ -1,4 +1,3 @@
-// @ts-nocheck
 // ============================================
 // src/mcp/servers/ServiceCatalogServer.ts
 // MCP Server: Service Catalog & Recommendations
@@ -270,7 +269,7 @@ export class ServiceCatalogServer implements MCPServer {
     this.handlers.set('calculate_service_package', this.calculateServicePackage.bind(this));
   }
 
-  async initialize(context: MCPExecutionContext): Promise<void> {
+  async initialize(_context: MCPExecutionContext): Promise<void> {
     // No initialization needed for in-memory catalog
   }
 
@@ -318,10 +317,10 @@ export class ServiceCatalogServer implements MCPServer {
           cached: true,
         },
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         success: false,
-        error: `Failed to search services: ${error.message}`,
+        error: `Failed to search services: ${error instanceof Error ? error.message : String(error)}`,
       };
     }
   }
@@ -348,10 +347,10 @@ export class ServiceCatalogServer implements MCPServer {
           cached: true,
         },
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         success: false,
-        error: `Failed to get service details: ${error.message}`,
+        error: `Failed to get service details: ${error instanceof Error ? error.message : String(error)}`,
       };
     }
   }
@@ -420,10 +419,10 @@ export class ServiceCatalogServer implements MCPServer {
           algorithm: 'keyword-matching',
         },
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         success: false,
-        error: `Failed to recommend services: ${error.message}`,
+        error: `Failed to recommend services: ${error instanceof Error ? error.message : String(error)}`,
       };
     }
   }
@@ -485,10 +484,10 @@ export class ServiceCatalogServer implements MCPServer {
           discount_applied: discount > 0,
         },
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
       return {
         success: false,
-        error: `Failed to calculate package: ${error.message}`,
+        error: `Failed to calculate package: ${error instanceof Error ? error.message : String(error)}`,
       };
     }
   }

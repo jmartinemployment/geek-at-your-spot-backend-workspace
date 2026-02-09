@@ -1,4 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
+import { logger } from '../utils/logger';
 
 export interface IntentClassification {
   primaryIntent: 'web_development' | 'analytics' | 'marketing' | 'website_analytics' | 'general';
@@ -73,7 +74,7 @@ Respond ONLY with JSON:
         };
       }
     } catch (e) {
-      console.error('Failed to parse classification:', e);
+      logger.error('Failed to parse classification', { error: e });
     }
 
     return {

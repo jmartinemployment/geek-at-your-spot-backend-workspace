@@ -1,7 +1,8 @@
-// @ts-nocheck
 // ============================================
 // src/types/index.ts - Type Definitions
 // ============================================
+
+import { Request } from 'express';
 export interface ChatMessage {
   role: 'user' | 'assistant' | 'system';
   content: string;
@@ -44,7 +45,7 @@ export interface ApiError {
 }
 
 // Express Request with custom properties
-export interface AuthenticatedRequest extends Express.Request {
+export interface AuthenticatedRequest extends Request {
   clientIP?: string;
   apiKeyValid?: boolean;
 }

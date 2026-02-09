@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { ConversationManager } from './conversation/ConversationManager';
 import { sendContactEmail, ContactFormData } from './services/emailService';
+import { logger } from './utils/logger';
 
 dotenv.config();
 
@@ -91,12 +92,12 @@ app.post('/api/email', async (req, res) => {
       message: 'Email sent successfully',
       id: result.id
     });
-  } catch (error: any) {
-    console.error('Email endpoint error:', error);
+  } catch (error: unknown) {
+    logger.error('Email endpoint error', { error });
     res.status(500).json({
       success: false,
       message: 'Failed to send email. Please try again.',
-      error: error.message
+      error: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -117,11 +118,11 @@ app.post('/api/chat', async (req, res) => {
     });
 
     res.json(response);
-  } catch (error: any) {
-    console.error('Chat error:', error);
-    res.status(500).json({ 
+  } catch (error: unknown) {
+    logger.error('Chat error', { error });
+    res.status(500).json({
       error: 'Failed to process message',
-      message: error.message 
+      message: error instanceof Error ? error.message : String(error)
     });
   }
 });
@@ -173,7 +174,7 @@ app.use('/api/web-dev', async (req, res) => {
     const data = await response.json();
     res.status(response.status).json(data);
   } catch (error) {
-    console.error('Proxy error (web-dev):', error);
+    logger.error('Proxy error (web-dev)', { error });
     res.status(500).json({ error: 'Failed to proxy request' });
   }
 });
@@ -194,7 +195,7 @@ app.use('/api/ai-analytics', async (req, res) => {
     const data = await response.json();
     res.status(response.status).json(data);
   } catch (error) {
-    console.error('Proxy error (ai-analytics):', error);
+    logger.error('Proxy error (ai-analytics)', { error });
     res.status(500).json({ error: 'Failed to proxy analytics request' });
   }
 });
@@ -215,7 +216,7 @@ app.use('/api/marketing', async (req, res) => {
     const data = await response.json();
     res.status(response.status).json(data);
   } catch (error) {
-    console.error('Proxy error (marketing):', error);
+    logger.error('Proxy error (marketing)', { error });
     res.status(500).json({ error: 'Failed to proxy marketing request' });
   }
 });
@@ -236,21 +237,22 @@ app.use('/api/website-analytics', async (req, res) => {
     const data = await response.json();
     res.status(response.status).json(data);
   } catch (error) {
-    console.error('Proxy error (website-analytics):', error);
+    logger.error('Proxy error (website-analytics)', { error });
     res.status(500).json({ error: 'Failed to proxy website analytics request' });
   }
 });
 
 app.listen(port, () => {
-  console.log(`\n===========================================`);
-  console.log(`🎮 Controller Backend v2.0 on port ${port}`);
-  console.log(`===========================================`);
-  console.log(`📡 Health: http://localhost:${port}/health`);
-  console.log(`📧 Email: http://localhost:${port}/api/email`);
-  console.log(`💬 Smart Chat: http://localhost:${port}/api/chat`);
-  console.log(`🔀 Web Dev: http://localhost:${port}/api/web-dev`);
-  console.log(`📊 Business Analytics: http://localhost:${port}/api/ai-analytics`);
-  console.log(`📣 Marketing: http://localhost:${port}/api/marketing`);
-  console.log(`📈 Website Analytics: http://localhost:${port}/api/website-analytics`);
-  console.log(`===========================================\n`);
+  logger.info('Controller Backend v2.0 started', {
+    port,
+    endpoints: {
+      health: `http://localhost:${port}/health`,
+      email: `http://localhost:${port}/api/email`,
+      chat: `http://localhost:${port}/api/chat`,
+      webDev: `http://localhost:${port}/api/web-dev`,
+      businessAnalytics: `http://localhost:${port}/api/ai-analytics`,
+      marketing: `http://localhost:${port}/api/marketing`,
+      websiteAnalytics: `http://localhost:${port}/api/website-analytics`
+    }
+  });
 });

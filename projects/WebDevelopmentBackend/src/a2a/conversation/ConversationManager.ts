@@ -8,6 +8,7 @@ import {
   ConversationContext,
   AgentMessage,
   AgentTask,
+  AgentRole,
   MessagePriority,
   TaskStatus,
   ConversationEvent,
@@ -334,7 +335,7 @@ export class ConversationManager {
     const agentsParticipated = Array.from(agentTaskCounts.entries()).map(
       ([agentId, tasksCompleted]) => ({
         agentId,
-        role: 'unknown' as any, // Would need agent registry to get role
+        role: 'coordinator' as AgentRole, // Default; would need agent registry for actual role
         tasksCompleted,
       })
     );
