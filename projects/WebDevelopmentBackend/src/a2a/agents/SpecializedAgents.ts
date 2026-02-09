@@ -18,6 +18,18 @@ function extractBulletPoints(text: string): string[] {
 }
 
 /**
+ * Shared helper: Extract recommendations section from text
+ * Used by ResearcherAgent and AnalystAgent.
+ */
+function extractRecommendationsFromText(text: string): string[] {
+  const recommendationSection = /recommendations?:?([\s\S]*?)(?=\n\n|\n#|$)/i.exec(text);
+  if (recommendationSection) {
+    return extractBulletPoints(recommendationSection[1]);
+  }
+  return [];
+}
+
+/**
  * CoordinatorAgent - Orchestrates multi-agent workflows
  */
 export class CoordinatorAgent extends BaseAgent {
@@ -106,16 +118,8 @@ Provide:
     return {
       findings,
       keyPoints: extractBulletPoints(findings),
-      recommendations: this.extractRecommendations(findings),
+      recommendations: extractRecommendationsFromText(findings),
     };
-  }
-
-  private extractRecommendations(text: string): string[] {
-    const recommendationSection = /recommendations?:?([\s\S]*?)(?=\n\n|\n#|$)/i.exec(text);
-    if (recommendationSection) {
-      return extractBulletPoints(recommendationSection[1]);
-    }
-    return [];
   }
 }
 
@@ -222,7 +226,7 @@ Provide:
   }
 
   private extractSection(text: string, sectionName: string): string {
-    const regex = new RegExp(`${sectionName}[:\\s]+(.*?)(?=\\n\\n|\\n[A-Z]|$)`, 'i');
+    const regex = new RegExp(String.raw`${sectionName}[:\s]+(.*?)(?=\n\n|\n[A-Z]|$)`, 'i');
     const match = regex.exec(text);
     return match ? match[1].trim() : '';
   }
@@ -265,7 +269,7 @@ Provide:
       analysis,
       keyMetrics: this.extractMetrics(analysis),
       insights: this.extractInsights(analysis),
-      recommendations: this.extractRecommendations(analysis),
+      recommendations: extractRecommendationsFromText(analysis),
     };
   }
 
@@ -287,14 +291,6 @@ Provide:
     const insightsSection = /insights?:?([\s\S]*?)(?=\n\n|\n#|recommendations|$)/i.exec(text);
     if (insightsSection) {
       return extractBulletPoints(insightsSection[1]);
-    }
-    return [];
-  }
-
-  private extractRecommendations(text: string): string[] {
-    const recommendationSection = /recommendations?:?([\s\S]*?)(?=\n\n|\n#|$)/i.exec(text);
-    if (recommendationSection) {
-      return extractBulletPoints(recommendationSection[1]);
     }
     return [];
   }

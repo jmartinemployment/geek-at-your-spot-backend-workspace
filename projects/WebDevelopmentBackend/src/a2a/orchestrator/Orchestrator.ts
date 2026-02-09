@@ -13,6 +13,7 @@ import {
   AgentTask,
   AgentResponse,
 } from '../types';
+import { toErrorMessage } from '../../utils/errors';
 
 export class Orchestrator {
   private readonly agentRegistry: AgentRegistry;
@@ -155,7 +156,7 @@ export class Orchestrator {
         tasksCompleted: 0,
         totalDuration,
         conversation: null,
-        error: error instanceof Error ? error.message : String(error),
+        error: toErrorMessage(error),
       };
     }
   }
@@ -181,16 +182,16 @@ export class Orchestrator {
 
         if (nextAgent?.isAvailable()) {
           // Create task
-          const task = this.conversationManager.addTask(
+          const task = this.conversationManager.addTask({
             conversationId,
-            nextAgent.getConfig().id,
-            currentAgent.getConfig().id,
-            currentResponse.delegateTo.task,
-            currentResponse.delegateTo.reason,
-            'normal',
-            [],
-            { previousResponse: currentResponse }
-          );
+            assignedToAgentId: nextAgent.getConfig().id,
+            createdByAgentId: currentAgent.getConfig().id,
+            title: currentResponse.delegateTo.task,
+            description: currentResponse.delegateTo.reason,
+            priority: 'normal',
+            dependencies: [],
+            input: { previousResponse: currentResponse },
+          });
 
           // Update task status
           this.conversationManager.updateTaskStatus(conversationId, task.id, 'in_progress');
@@ -265,14 +266,14 @@ export class Orchestrator {
         return { error: 'No agent available for task', task: taskDesc };
       }
 
-      const task = this.conversationManager.addTask(
+      const task = this.conversationManager.addTask({
         conversationId,
-        agent.getConfig().id,
-        coordinator.getConfig().id,
-        taskDesc,
-        `Parallel task: ${taskDesc}`,
-        'normal'
-      );
+        assignedToAgentId: agent.getConfig().id,
+        createdByAgentId: coordinator.getConfig().id,
+        title: taskDesc,
+        description: `Parallel task: ${taskDesc}`,
+        priority: 'normal',
+      });
 
       this.conversationManager.updateTaskStatus(conversationId, task.id, 'in_progress');
 
@@ -287,7 +288,7 @@ export class Orchestrator {
 
         return { success: true, task: taskDesc, result };
       } catch (error: unknown) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage = toErrorMessage(error);
         this.conversationManager.updateTaskStatus(conversationId, task.id, 'failed', null, errorMessage);
 
         return { success: false, task: taskDesc, error: errorMessage };
@@ -328,14 +329,14 @@ export class Orchestrator {
         const delegateAgent = this.agentRegistry.getAgent(response.delegateTo.agentId);
 
         if (delegateAgent?.isAvailable()) {
-          const task = this.conversationManager.addTask(
+          const task = this.conversationManager.addTask({
             conversationId,
-            delegateAgent.getConfig().id,
-            agent.getConfig().id,
-            response.delegateTo.task,
-            response.delegateTo.reason,
-            'normal'
-          );
+            assignedToAgentId: delegateAgent.getConfig().id,
+            createdByAgentId: agent.getConfig().id,
+            title: response.delegateTo.task,
+            description: response.delegateTo.reason,
+            priority: 'normal',
+          });
 
           this.conversationManager.updateTaskStatus(conversationId, task.id, 'in_progress');
 
@@ -411,14 +412,14 @@ export class Orchestrator {
     for (const taskDesc of tasks) {
       const agent = availableAgents[agentIndex % availableAgents.length];
 
-      const task = this.conversationManager.addTask(
+      const task = this.conversationManager.addTask({
         conversationId,
-        agent.getConfig().id,
-        coordinator.getConfig().id,
-        taskDesc,
-        `Round-robin task: ${taskDesc}`,
-        'normal'
-      );
+        assignedToAgentId: agent.getConfig().id,
+        createdByAgentId: coordinator.getConfig().id,
+        title: taskDesc,
+        description: `Round-robin task: ${taskDesc}`,
+        priority: 'normal',
+      });
 
       this.conversationManager.updateTaskStatus(conversationId, task.id, 'in_progress');
 
@@ -433,7 +434,7 @@ export class Orchestrator {
 
         this.conversationManager.updateTaskStatus(conversationId, task.id, 'completed', result);
       } catch (error: unknown) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage = toErrorMessage(error);
         results.push({ success: false, task: taskDesc, error: errorMessage });
 
         this.conversationManager.updateTaskStatus(

@@ -14,6 +14,7 @@ import {
 } from '../types';
 import { JobQueue } from '../queue/JobQueue';
 import { logger } from '../../../utils/logger';
+import { toErrorMessage } from '../../../utils/errors';
 
 export class JobProcessor {
   private readonly queue: JobQueue;
@@ -165,7 +166,7 @@ export class JobProcessor {
       this.emitEvent('job_completed', job.id, { result });
     } catch (error: unknown) {
       // Job failed
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage = toErrorMessage(error);
 
       this.queue.updateJob(job.id, {
         status: 'failed',

@@ -6,6 +6,7 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { MCPRegistry } from '../registry/MCPRegistry';
 import { MCPTool } from '../types';
+import { toErrorMessage } from '../../utils/errors';
 
 export interface MCPClientConfig {
   apiKey: string;
@@ -146,7 +147,7 @@ export class MCPClient {
         },
       };
     } catch (error: unknown) {
-      throw new Error(`Chat failed: ${error instanceof Error ? error.message : String(error)}`);
+      throw new Error(`Chat failed: ${toErrorMessage(error)}`);
     }
   }
 
@@ -176,7 +177,7 @@ export class MCPClient {
       );
       return textBlocks.map((block) => block.text).join('\n');
     } catch (error: unknown) {
-      throw new Error(`Simple chat failed: ${error instanceof Error ? error.message : String(error)}`);
+      throw new Error(`Simple chat failed: ${toErrorMessage(error)}`);
     }
   }
 

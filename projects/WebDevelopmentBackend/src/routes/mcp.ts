@@ -6,6 +6,7 @@
 import { Router, Request, Response } from 'express';
 import { MCPRegistry } from '../mcp/registry/MCPRegistry';
 import { MCPClient } from '../mcp/client/MCPClient';
+import { toErrorMessage } from '../utils/errors';
 
 const router = Router();
 
@@ -35,7 +36,7 @@ router.get('/health', async (req: Request, res: Response) => {
   } catch (error: unknown) {
     return res.status(500).json({
       status: 'error',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });
@@ -70,7 +71,7 @@ router.get('/tools', (req: Request, res: Response) => {
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to get tools',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });
@@ -99,7 +100,7 @@ router.get('/stats', (req: Request, res: Response) => {
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to get stats',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });
@@ -138,7 +139,7 @@ router.post('/execute', async (req: Request, res: Response) => {
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'Tool execution failed',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });
@@ -175,7 +176,7 @@ router.post('/chat', async (req: Request, res: Response) => {
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'Chat failed',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });
@@ -210,7 +211,7 @@ router.get('/servers', (req: Request, res: Response) => {
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to get servers',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });
@@ -253,7 +254,7 @@ router.get('/tool/:toolName', (req: Request, res: Response) => {
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to get tool details',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });
@@ -280,7 +281,7 @@ router.post('/stats/reset', (req: Request, res: Response) => {
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to reset stats',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });

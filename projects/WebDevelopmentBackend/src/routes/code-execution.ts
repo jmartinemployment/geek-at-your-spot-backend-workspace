@@ -5,6 +5,7 @@
 
 import { Router, Request, Response } from 'express';
 import { CodeExecutionService } from '../code-execution';
+import { toErrorMessage } from '../utils/errors';
 
 const router = Router();
 
@@ -41,7 +42,7 @@ router.post('/execute', async (req: Request, res: Response) => {
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'Code execution failed',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });
@@ -80,7 +81,7 @@ router.post('/calculate-cost', async (req: Request, res: Response) => {
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'Cost calculation failed',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });
@@ -119,7 +120,7 @@ router.post('/generate-timeline', async (req: Request, res: Response) => {
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'Timeline generation failed',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });
@@ -157,7 +158,7 @@ router.post('/check-feasibility', async (req: Request, res: Response) => {
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'Feasibility check failed',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });
@@ -190,7 +191,7 @@ router.post('/validate', async (req: Request, res: Response) => {
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'Validation failed',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });
@@ -223,7 +224,7 @@ router.post('/validate-syntax', async (req: Request, res: Response) => {
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'Syntax validation failed',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });
@@ -251,7 +252,7 @@ router.get('/features', (req: Request, res: Response) => {
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to get features',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });
@@ -279,7 +280,7 @@ router.get('/health', async (req: Request, res: Response) => {
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'Health check failed',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });
@@ -304,7 +305,7 @@ router.get('/stats', (req: Request, res: Response) => {
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to get stats',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });

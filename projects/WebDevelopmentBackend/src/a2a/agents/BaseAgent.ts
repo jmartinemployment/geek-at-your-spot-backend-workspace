@@ -12,6 +12,7 @@ import {
   AgentResponse,
   AgentMetrics,
 } from '../types';
+import { toErrorMessage } from '../../utils/errors';
 
 export abstract class BaseAgent {
   protected config: AgentConfig;
@@ -111,7 +112,7 @@ export abstract class BaseAgent {
       this.state.status = 'idle';
       this.state.tasksFailed++;
 
-      throw new Error(`Agent ${this.config.id} failed to process message: ${error instanceof Error ? error.message : String(error)}`);
+      throw new Error(`Agent ${this.config.id} failed to process message: ${toErrorMessage(error)}`);
     }
   }
 
@@ -253,11 +254,12 @@ export abstract class BaseAgent {
    * Add message to conversation history
    */
   protected addToConversationHistory(conversationId: string, message: AgentMessage): void {
-    if (!this.conversationHistory.has(conversationId)) {
-      this.conversationHistory.set(conversationId, []);
+    let history = this.conversationHistory.get(conversationId);
+    if (!history) {
+      history = [];
+      this.conversationHistory.set(conversationId, history);
     }
 
-    const history = this.conversationHistory.get(conversationId)!;
     history.push(message);
 
     // Keep only last 50 messages per conversation

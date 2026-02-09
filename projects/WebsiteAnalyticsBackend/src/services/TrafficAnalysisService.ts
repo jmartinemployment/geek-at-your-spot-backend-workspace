@@ -42,8 +42,11 @@ export class TrafficAnalysisService {
   }
 
   private buildTrafficPrompt(data: TrafficData): string {
-    const topPagesSection = data.topPages
-      ? `Top Pages:\n${data.topPages.map(p => `- ${p.page}: ${p.views} views`).join('\n')}`
+    const topPagesList = data.topPages
+      ? data.topPages.map(p => `- ${p.page}: ${p.views} views`).join('\n')
+      : '';
+    const topPagesSection = topPagesList
+      ? `Top Pages:\n${topPagesList}`
       : '';
 
     return `Analyze this website traffic data:

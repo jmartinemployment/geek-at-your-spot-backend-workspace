@@ -24,6 +24,7 @@ import {
   JobEventType,
   BulkOperationResult,
 } from './types';
+import { toErrorMessage } from '../../utils/errors';
 
 export class BatchService {
   private config: BatchConfig;
@@ -228,7 +229,7 @@ export class BatchService {
       try {
         this.cancelJob(jobId);
       } catch (error) {
-        // Continue cancelling other jobs
+        logger.warn(`[Batch Service] Failed to cancel job ${jobId} in batch ${batchId}`, { error });
       }
     }
 
@@ -508,7 +509,7 @@ export class BatchService {
         this.retryJob(job.id);
         results.push({ jobId: job.id, success: true });
       } catch (error: unknown) {
-        results.push({ jobId: job.id, success: false, error: error instanceof Error ? error.message : String(error) });
+        results.push({ jobId: job.id, success: false, error: toErrorMessage(error) });
       }
     }
 

@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { AnalyticsService } from './analytics/AnalyticsService';
 import { logger } from './utils/logger';
+import { toErrorMessage } from './utils/errors';
 
 dotenv.config();
 
@@ -44,7 +45,7 @@ app.post('/api/analytics/revenue', async (req: Request, res: Response) => {
     });
     res.json(result);
   } catch (error: unknown) {
-    res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+    res.status(500).json({ error: toErrorMessage(error) });
   }
 });
 

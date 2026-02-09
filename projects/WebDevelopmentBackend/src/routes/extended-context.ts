@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { ExtendedContextService } from '../extended-context';
+import { toErrorMessage } from '../utils/errors';
 
 const router = Router();
 
@@ -36,7 +37,7 @@ router.post('/messages', async (req: Request, res: Response) => {
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to add message',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });
@@ -80,7 +81,7 @@ router.get('/messages/:conversationId', (req: Request, res: Response) => {
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to get messages',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });
@@ -118,7 +119,7 @@ router.get('/window/:conversationId', (req: Request, res: Response) => {
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to get window',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });
@@ -156,7 +157,7 @@ router.get('/stats/:conversationId', (req: Request, res: Response) => {
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to get stats',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });
@@ -190,7 +191,7 @@ router.post('/compress/:conversationId', async (req: Request, res: Response) => 
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'Compression failed',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });
@@ -224,7 +225,7 @@ router.post('/snapshots/:conversationId', async (req: Request, res: Response) =>
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to create snapshot',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });
@@ -260,7 +261,7 @@ router.get('/snapshots/:conversationId', (req: Request, res: Response) => {
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to get snapshots',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });
@@ -302,7 +303,7 @@ router.post('/restore/:conversationId', async (req: Request, res: Response) => {
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to restore snapshot',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });
@@ -343,7 +344,7 @@ router.post('/summarize', async (req: Request, res: Response) => {
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'Summarization failed',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });
@@ -392,7 +393,7 @@ router.post('/split/:conversationId', (req: Request, res: Response) => {
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to split conversation',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });
@@ -429,7 +430,7 @@ router.post('/count-tokens', (req: Request, res: Response) => {
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to count tokens',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });
@@ -465,7 +466,7 @@ router.get('/events/:conversationId', (req: Request, res: Response) => {
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to get events',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });
@@ -499,7 +500,7 @@ router.delete('/:conversationId', (req: Request, res: Response) => {
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to clear conversation',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });
@@ -525,7 +526,7 @@ router.get('/health', async (req: Request, res: Response) => {
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'Health check failed',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });
@@ -550,7 +551,7 @@ router.get('/stats', (req: Request, res: Response) => {
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to get stats',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });

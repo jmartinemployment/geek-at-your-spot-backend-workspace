@@ -102,6 +102,7 @@ app.get('/health', async (_req, res) => {
   try {
     await prisma.$queryRaw`SELECT 1`;
   } catch (error) {
+    logger.warn('[Health] Database check failed', { error });
     healthStatus.database = 'disconnected';
     healthStatus.status = 'degraded';
   }
@@ -118,6 +119,7 @@ app.get('/health', async (_req, res) => {
         healthStatus.status = 'degraded';
       }
     } catch (error) {
+      logger.warn('[Health] MCP health check failed', { error });
       healthStatus.mcp.status = 'error';
       healthStatus.status = 'degraded';
     }

@@ -12,6 +12,7 @@ import {
   ExecutionContext,
   SandboxConfig,
 } from '../types';
+import { toErrorMessage } from '../../utils/errors';
 
 export class PythonExecutor {
   private defaultConfig: SandboxConfig = {
@@ -86,7 +87,7 @@ export class PythonExecutor {
 
       return {
         success: false,
-        error: error instanceof Error ? error.message : String(error),
+        error: toErrorMessage(error),
         executionTime,
         logs,
       };
@@ -136,7 +137,7 @@ if __name__ == '__main__':
     } catch (error: unknown) {
       return {
         valid: false,
-        error: error instanceof Error ? error.message : String(error),
+        error: toErrorMessage(error),
       };
     }
   }
@@ -214,7 +215,7 @@ def _restricted_import(name, *args, **kwargs):
 __builtins__.__import__ = _restricted_import
 
 # Setup input
-__input__ = json.loads('${inputJson.replaceAll("'", "\\'")}')
+__input__ = json.loads('${inputJson.replaceAll("'", String.raw`\'`)}')
 
 # Capture logs
 _logs = []

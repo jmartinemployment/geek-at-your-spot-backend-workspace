@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { A2AService } from '../a2a';
+import { toErrorMessage } from '../utils/errors';
 
 const router = Router();
 
@@ -39,7 +40,7 @@ router.post('/execute', async (req: Request, res: Response) => {
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'A2A execution failed',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });
@@ -77,7 +78,7 @@ router.get('/conversations/:conversationId', (req: Request, res: Response) => {
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to get conversation',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });
@@ -109,7 +110,7 @@ router.get('/conversations/:conversationId/summary', (req: Request, res: Respons
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to get conversation summary',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });
@@ -143,7 +144,7 @@ router.delete('/conversations/:conversationId', (req: Request, res: Response) =>
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to delete conversation',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });
@@ -178,7 +179,7 @@ router.get('/conversations/user/:userId', (req: Request, res: Response) => {
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to get user conversations',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });
@@ -207,7 +208,7 @@ router.get('/conversations/recent', (req: Request, res: Response) => {
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to get recent conversations',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });
@@ -235,7 +236,7 @@ router.get('/conversations/active', (req: Request, res: Response) => {
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to get active conversations',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });
@@ -272,7 +273,7 @@ router.get('/conversations/search', (req: Request, res: Response) => {
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'Search failed',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });
@@ -300,7 +301,7 @@ router.get('/agents', (req: Request, res: Response) => {
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to get agents',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });
@@ -336,7 +337,7 @@ router.get('/agents/role/:role', (req: Request, res: Response) => {
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to get agents by role',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });
@@ -378,7 +379,7 @@ router.post('/agents/:agentId/enable', (req: Request, res: Response) => {
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to update agent',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });
@@ -406,7 +407,7 @@ router.get('/metrics', (req: Request, res: Response) => {
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to get metrics',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });
@@ -431,7 +432,7 @@ router.get('/stats', (req: Request, res: Response) => {
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to get stats',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });
@@ -457,7 +458,7 @@ router.get('/health', async (req: Request, res: Response) => {
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'Health check failed',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });
@@ -486,7 +487,7 @@ router.put('/strategy', (req: Request, res: Response) => {
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to update strategy',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });
@@ -511,7 +512,7 @@ router.get('/strategy', (req: Request, res: Response) => {
   } catch (error: unknown) {
     return res.status(500).json({
       error: 'Failed to get strategy',
-      message: error instanceof Error ? error.message : String(error),
+      message: toErrorMessage(error),
     });
   }
 });

@@ -14,6 +14,7 @@ import {
   ToolExecutionOptions,
   RegistryStats,
 } from '../types';
+import { toErrorMessage } from '../../utils/errors';
 import { ProjectKnowledgeServer } from '../servers/ProjectKnowledgeServer';
 import { ServiceCatalogServer } from '../servers/ServiceCatalogServer';
 import { PricingServer } from '../servers/PricingServer';
@@ -133,7 +134,7 @@ export class MCPRegistry {
 
       return {
         success: false,
-        error: `Tool execution failed: ${error instanceof Error ? error.message : String(error)}`,
+        error: `Tool execution failed: ${toErrorMessage(error)}`,
         metadata: {
           executionTime,
         },

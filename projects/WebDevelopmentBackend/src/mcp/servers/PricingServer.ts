@@ -17,6 +17,7 @@ import {
   BudgetOptimizationParams,
   BudgetOptimizationResult,
 } from '../types';
+import { toErrorMessage } from '../../utils/errors';
 
 export class PricingServer implements MCPServer {
   name = 'PricingServer';
@@ -339,7 +340,7 @@ export class PricingServer implements MCPServer {
     } catch (error: unknown) {
       return {
         success: false,
-        error: `Failed to estimate cost: ${error instanceof Error ? error.message : String(error)}`,
+        error: `Failed to estimate cost: ${toErrorMessage(error)}`,
       };
     }
   }
@@ -394,7 +395,7 @@ export class PricingServer implements MCPServer {
     } catch (error: unknown) {
       return {
         success: false,
-        error: `Failed to get feature pricing: ${error instanceof Error ? error.message : String(error)}`,
+        error: `Failed to get feature pricing: ${toErrorMessage(error)}`,
       };
     }
   }
@@ -479,7 +480,7 @@ export class PricingServer implements MCPServer {
     } catch (error: unknown) {
       return {
         success: false,
-        error: `Failed to compare pricing: ${error instanceof Error ? error.message : String(error)}`,
+        error: `Failed to compare pricing: ${toErrorMessage(error)}`,
       };
     }
   }
@@ -567,7 +568,7 @@ export class PricingServer implements MCPServer {
     } catch (error: unknown) {
       return {
         success: false,
-        error: `Failed to optimize budget: ${error instanceof Error ? error.message : String(error)}`,
+        error: `Failed to optimize budget: ${toErrorMessage(error)}`,
       };
     }
   }

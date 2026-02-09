@@ -15,6 +15,7 @@ import {
   ServicePackageParams,
   ServicePackageResult,
 } from '../types';
+import { toErrorMessage } from '../../utils/errors';
 
 export class ServiceCatalogServer implements MCPServer {
   name = 'ServiceCatalogServer';
@@ -321,7 +322,7 @@ export class ServiceCatalogServer implements MCPServer {
     } catch (error: unknown) {
       return {
         success: false,
-        error: `Failed to search services: ${error instanceof Error ? error.message : String(error)}`,
+        error: `Failed to search services: ${toErrorMessage(error)}`,
       };
     }
   }
@@ -351,7 +352,7 @@ export class ServiceCatalogServer implements MCPServer {
     } catch (error: unknown) {
       return {
         success: false,
-        error: `Failed to get service details: ${error instanceof Error ? error.message : String(error)}`,
+        error: `Failed to get service details: ${toErrorMessage(error)}`,
       };
     }
   }
@@ -423,7 +424,7 @@ export class ServiceCatalogServer implements MCPServer {
     } catch (error: unknown) {
       return {
         success: false,
-        error: `Failed to recommend services: ${error instanceof Error ? error.message : String(error)}`,
+        error: `Failed to recommend services: ${toErrorMessage(error)}`,
       };
     }
   }
@@ -488,7 +489,7 @@ export class ServiceCatalogServer implements MCPServer {
     } catch (error: unknown) {
       return {
         success: false,
-        error: `Failed to calculate package: ${error instanceof Error ? error.message : String(error)}`,
+        error: `Failed to calculate package: ${toErrorMessage(error)}`,
       };
     }
   }

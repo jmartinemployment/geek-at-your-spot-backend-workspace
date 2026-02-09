@@ -12,6 +12,7 @@ import {
   SummarizationResult,
   HierarchicalSummaryNode,
 } from '../types';
+import { toErrorMessage } from '../../utils/errors';
 
 export class ContextCompressor {
   private readonly client: Anthropic;
@@ -69,7 +70,7 @@ export class ContextCompressor {
         strategy: options.strategy,
         messagesRemoved: 0,
         messagesPreserved: messages.length,
-        error: error instanceof Error ? error.message : String(error),
+        error: toErrorMessage(error),
       };
     }
   }

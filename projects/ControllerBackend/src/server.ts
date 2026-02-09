@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { ConversationManager } from './conversation/ConversationManager';
 import { sendContactEmail, ContactFormData } from './services/emailService';
 import { logger } from './utils/logger';
+import { toErrorMessage } from './utils/errors';
 
 dotenv.config();
 
@@ -97,7 +98,7 @@ app.post('/api/email', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to send email. Please try again.',
-      error: error instanceof Error ? error.message : String(error)
+      error: toErrorMessage(error)
     });
   }
 });
@@ -122,7 +123,7 @@ app.post('/api/chat', async (req, res) => {
     logger.error('Chat error', { error });
     res.status(500).json({
       error: 'Failed to process message',
-      message: error instanceof Error ? error.message : String(error)
+      message: toErrorMessage(error)
     });
   }
 });

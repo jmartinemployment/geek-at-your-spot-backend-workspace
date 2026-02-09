@@ -17,6 +17,18 @@ import {
   AgentHandoff,
 } from '../types';
 
+export interface AddTaskOptions {
+  conversationId: string;
+  assignedToAgentId: string;
+  createdByAgentId: string;
+  title: string;
+  description: string;
+  priority?: MessagePriority;
+  dependencies?: string[];
+  input?: any;
+  metadata?: Record<string, any>;
+}
+
 export class ConversationManager {
   private readonly conversations: Map<string, ConversationContext> = new Map();
   private readonly events: Map<string, ConversationEvent[]> = new Map();
@@ -113,17 +125,19 @@ export class ConversationManager {
   /**
    * Add task to conversation
    */
-  addTask(
-    conversationId: string,
-    assignedToAgentId: string,
-    createdByAgentId: string,
-    title: string,
-    description: string,
-    priority: MessagePriority = 'normal',
-    dependencies: string[] = [],
-    input?: any,
-    metadata?: Record<string, any>
-  ): AgentTask {
+  addTask(options: AddTaskOptions): AgentTask {
+    const {
+      conversationId,
+      assignedToAgentId,
+      createdByAgentId,
+      title,
+      description,
+      priority = 'normal',
+      dependencies = [],
+      input,
+      metadata,
+    } = options;
+
     const conversation = this.getConversation(conversationId);
     if (!conversation) {
       throw new Error(`Conversation ${conversationId} not found`);
@@ -417,14 +431,15 @@ export class ConversationManager {
       timestamp: new Date(),
     };
 
-    if (!this.events.has(conversationId)) {
-      this.events.set(conversationId, []);
+    let events = this.events.get(conversationId);
+    if (!events) {
+      events = [];
+      this.events.set(conversationId, events);
     }
 
-    this.events.get(conversationId)!.push(event);
+    events.push(event);
 
     // Keep only last 1000 events per conversation
-    const events = this.events.get(conversationId)!;
     if (events.length > 1000) {
       events.shift();
     }

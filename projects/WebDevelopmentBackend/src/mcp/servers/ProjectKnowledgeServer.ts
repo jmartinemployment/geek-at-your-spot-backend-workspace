@@ -15,6 +15,7 @@ import {
   ProjectStatistics,
   TechnologyRecommendation,
 } from '../types';
+import { toErrorMessage } from '../../utils/errors';
 
 export class ProjectKnowledgeServer implements MCPServer {
   name = 'ProjectKnowledgeServer';
@@ -226,7 +227,7 @@ export class ProjectKnowledgeServer implements MCPServer {
     } catch (error: unknown) {
       return {
         success: false,
-        error: `Failed to search projects: ${error instanceof Error ? error.message : String(error)}`,
+        error: `Failed to search projects: ${toErrorMessage(error)}`,
       };
     }
   }
@@ -319,7 +320,7 @@ export class ProjectKnowledgeServer implements MCPServer {
     } catch (error: unknown) {
       return {
         success: false,
-        error: `Failed to get statistics: ${error instanceof Error ? error.message : String(error)}`,
+        error: `Failed to get statistics: ${toErrorMessage(error)}`,
       };
     }
   }
@@ -408,7 +409,7 @@ export class ProjectKnowledgeServer implements MCPServer {
     } catch (error: unknown) {
       return {
         success: false,
-        error: `Failed to get recommendations: ${error instanceof Error ? error.message : String(error)}`,
+        error: `Failed to get recommendations: ${toErrorMessage(error)}`,
       };
     }
   }

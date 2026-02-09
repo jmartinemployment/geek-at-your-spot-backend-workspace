@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { ContentService } from './services/ContentService';
 import { SEOService } from './services/SEOService';
 import { logger } from './utils/logger';
+import { toErrorMessage } from './utils/errors';
 
 dotenv.config();
 
@@ -54,7 +55,7 @@ app.post('/api/marketing/content', async (req: Request, res: Response) => {
     logger.error('Content generation error', { error });
     res.status(500).json({
       error: 'Content generation failed',
-      message: error instanceof Error ? error.message : String(error)
+      message: toErrorMessage(error)
     });
   }
 });
@@ -68,7 +69,7 @@ app.post('/api/marketing/seo', async (req: Request, res: Response) => {
     logger.error('SEO analysis error', { error });
     res.status(500).json({
       error: 'SEO analysis failed',
-      message: error instanceof Error ? error.message : String(error)
+      message: toErrorMessage(error)
     });
   }
 });

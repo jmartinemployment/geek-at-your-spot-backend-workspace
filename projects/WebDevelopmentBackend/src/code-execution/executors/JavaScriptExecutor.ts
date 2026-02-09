@@ -9,6 +9,7 @@ import {
   ExecutionContext,
   SandboxConfig,
 } from '../types';
+import { toErrorMessage } from '../../utils/errors';
 
 export class JavaScriptExecutor {
   private defaultConfig: SandboxConfig = {
@@ -93,7 +94,7 @@ export class JavaScriptExecutor {
     } catch (error: unknown) {
       const executionTime = Date.now() - startTime;
 
-      const rawMessage = error instanceof Error ? error.message : String(error);
+      const rawMessage = toErrorMessage(error);
       let errorMessage = rawMessage;
       if (rawMessage.includes('Script execution timed out')) {
         errorMessage = `Execution timeout after ${this.defaultConfig.timeout}ms`;
@@ -129,7 +130,7 @@ export class JavaScriptExecutor {
     } catch (error: unknown) {
       return {
         valid: false,
-        error: error instanceof Error ? error.message : String(error),
+        error: toErrorMessage(error),
       };
     }
   }

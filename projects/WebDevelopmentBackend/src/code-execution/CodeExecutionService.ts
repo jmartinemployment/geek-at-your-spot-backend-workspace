@@ -21,6 +21,7 @@ import {
   ValidationRule,
   ValidationResult,
 } from './types';
+import { toErrorMessage } from '../utils/errors';
 
 export class CodeExecutionService {
   private readonly jsExecutor: JavaScriptExecutor;
@@ -134,7 +135,7 @@ export class CodeExecutionService {
 
       return {
         success: false,
-        error: error instanceof Error ? error.message : String(error),
+        error: toErrorMessage(error),
         executionTime: Date.now() - startTime,
       };
     }

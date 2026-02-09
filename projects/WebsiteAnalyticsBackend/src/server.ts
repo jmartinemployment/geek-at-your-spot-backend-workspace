@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { TrafficAnalysisService } from './services/TrafficAnalysisService';
 import { ConversionOptimizationService } from './services/ConversionOptimizationService';
 import { logger } from './utils/logger';
+import { toErrorMessage } from './utils/errors';
 
 dotenv.config();
 
@@ -42,7 +43,7 @@ app.post('/api/analytics/traffic', async (req: Request, res: Response) => {
     const result = await trafficService.analyzeTraffic(req.body);
     res.json(result);
   } catch (error: unknown) {
-    res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+    res.status(500).json({ error: toErrorMessage(error) });
   }
 });
 
@@ -51,7 +52,7 @@ app.post('/api/analytics/conversion', async (req: Request, res: Response) => {
     const result = await conversionService.analyzeConversion(req.body);
     res.json(result);
   } catch (error: unknown) {
-    res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+    res.status(500).json({ error: toErrorMessage(error) });
   }
 });
 
