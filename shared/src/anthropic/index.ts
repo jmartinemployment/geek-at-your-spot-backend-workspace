@@ -1,6 +1,20 @@
 import Anthropic from '@anthropic-ai/sdk';
 
 /**
+ * Advance past a JSON string literal, handling escape sequences.
+ * @param text source text
+ * @param start index of the opening '"'
+ * @returns index of the closing '"'
+ */
+function skipJsonString(text: string, start: number): number {
+  for (let i = start + 1; i < text.length; i++) {
+    if (text[i] === '\\') { i++; continue; }
+    if (text[i] === '"') return i;
+  }
+  return text.length;
+}
+
+/**
  * Extract the outermost balanced JSON object from a string without regex backtracking.
  * Scans for the first '{' then counts balanced braces to find the matching '}'.
  * O(n) with no backtracking -- safe from ReDoS (SonarCloud S5852).
@@ -10,38 +24,15 @@ export function extractBalancedJSON(text: string): string | null {
   if (start === -1) return null;
 
   let depth = 0;
-  let inString = false;
-  let escape = false;
-
   for (let i = start; i < text.length; i++) {
     const ch = text[i];
-
-    if (escape) {
-      escape = false;
-      continue;
-    }
-
-    if (ch === '\\' && inString) {
-      escape = true;
-      continue;
-    }
-
-    if (ch === '"') {
-      inString = !inString;
-      continue;
-    }
-
-    if (inString) continue;
-
+    if (ch === '"') { i = skipJsonString(text, i); continue; }
     if (ch === '{') depth++;
     else if (ch === '}') {
       depth--;
-      if (depth === 0) {
-        return text.substring(start, i + 1);
-      }
+      if (depth === 0) return text.substring(start, i + 1);
     }
   }
-
   return null;
 }
 
