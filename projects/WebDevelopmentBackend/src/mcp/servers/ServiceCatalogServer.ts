@@ -170,98 +170,97 @@ export class ServiceCatalogServer implements MCPServer {
   }
 
   private initializeTools() {
-    this.tools.push({
-      name: 'search_services',
-      description: 'Search available services by keyword, category, or price range. Returns matching services with pricing and features.',
-      input_schema: {
-        type: 'object',
-        properties: {
-          query: {
-            type: 'string',
-            description: 'Search query for service name or description',
-          },
-          category: {
-            type: 'string',
-            enum: ['web-development', 'mobile-development', 'ecommerce', 'backend', 'design', 'consulting', 'support', 'marketing', 'infrastructure'],
-            description: 'Filter by service category',
-          },
-          min_price: {
-            type: 'number',
-            description: 'Minimum price filter',
-          },
-          max_price: {
-            type: 'number',
-            description: 'Maximum price filter',
-          },
-        },
-      },
-    });
-
-    this.tools.push({
-      name: 'get_service_details',
-      description: 'Get detailed information about a specific service including full feature list, pricing breakdown, and suitability.',
-      input_schema: {
-        type: 'object',
-        properties: {
-          service_id: {
-            type: 'string',
-            description: 'Service ID (e.g., "web-basic", "ecommerce")',
-          },
-        },
-        required: ['service_id'],
-      },
-    });
-
-    this.tools.push({
-      name: 'recommend_services',
-      description: 'Get AI-powered service recommendations based on project description, budget, and priorities. Analyzes requirements and suggests best-fit services.',
-      input_schema: {
-        type: 'object',
-        properties: {
-          project_description: {
-            type: 'string',
-            description: 'Description of the project or requirements',
-          },
-          budget: {
-            type: 'number',
-            description: 'Available budget',
-          },
-          timeline: {
-            type: 'number',
-            description: 'Target timeline in weeks',
-          },
-          priorities: {
-            type: 'array',
-            items: {
+    this.tools.push(
+      {
+        name: 'search_services',
+        description: 'Search available services by keyword, category, or price range. Returns matching services with pricing and features.',
+        input_schema: {
+          type: 'object',
+          properties: {
+            query: {
               type: 'string',
-              enum: ['cost', 'quality', 'speed'],
+              description: 'Search query for service name or description',
             },
-            description: 'Prioritize factors (e.g., ["quality", "cost"])',
+            category: {
+              type: 'string',
+              enum: ['web-development', 'mobile-development', 'ecommerce', 'backend', 'design', 'consulting', 'support', 'marketing', 'infrastructure'],
+              description: 'Filter by service category',
+            },
+            min_price: {
+              type: 'number',
+              description: 'Minimum price filter',
+            },
+            max_price: {
+              type: 'number',
+              description: 'Maximum price filter',
+            },
           },
         },
-        required: ['project_description'],
       },
-    });
-
-    this.tools.push({
-      name: 'calculate_service_package',
-      description: 'Calculate total cost and timeline for a package of services. Includes discounts, tax calculations, and bundling benefits.',
-      input_schema: {
-        type: 'object',
-        properties: {
-          service_ids: {
-            type: 'array',
-            items: { type: 'string' },
-            description: 'Array of service IDs to include in package',
+      {
+        name: 'get_service_details',
+        description: 'Get detailed information about a specific service including full feature list, pricing breakdown, and suitability.',
+        input_schema: {
+          type: 'object',
+          properties: {
+            service_id: {
+              type: 'string',
+              description: 'Service ID (e.g., "web-basic", "ecommerce")',
+            },
           },
-          discount_code: {
-            type: 'string',
-            description: 'Optional discount code',
-          },
+          required: ['service_id'],
         },
-        required: ['service_ids'],
       },
-    });
+      {
+        name: 'recommend_services',
+        description: 'Get AI-powered service recommendations based on project description, budget, and priorities. Analyzes requirements and suggests best-fit services.',
+        input_schema: {
+          type: 'object',
+          properties: {
+            project_description: {
+              type: 'string',
+              description: 'Description of the project or requirements',
+            },
+            budget: {
+              type: 'number',
+              description: 'Available budget',
+            },
+            timeline: {
+              type: 'number',
+              description: 'Target timeline in weeks',
+            },
+            priorities: {
+              type: 'array',
+              items: {
+                type: 'string',
+                enum: ['cost', 'quality', 'speed'],
+              },
+              description: 'Prioritize factors (e.g., ["quality", "cost"])',
+            },
+          },
+          required: ['project_description'],
+        },
+      },
+      {
+        name: 'calculate_service_package',
+        description: 'Calculate total cost and timeline for a package of services. Includes discounts, tax calculations, and bundling benefits.',
+        input_schema: {
+          type: 'object',
+          properties: {
+            service_ids: {
+              type: 'array',
+              items: { type: 'string' },
+              description: 'Array of service IDs to include in package',
+            },
+            discount_code: {
+              type: 'string',
+              description: 'Optional discount code',
+            },
+          },
+          required: ['service_ids'],
+        },
+      },
+    );
 
     this.handlers.set('search_services', this.searchServices.bind(this));
     this.handlers.set('get_service_details', this.getServiceDetails.bind(this));
@@ -299,10 +298,12 @@ export class ServiceCatalogServer implements MCPServer {
       }
 
       if (params.min_price !== undefined) {
-        results = results.filter((service) => service.price_range.max >= params.min_price!);
+        const minPrice = params.min_price;
+        results = results.filter((service) => service.price_range.max >= minPrice);
       }
       if (params.max_price !== undefined) {
-        results = results.filter((service) => service.price_range.min <= params.max_price!);
+        const maxPrice = params.max_price;
+        results = results.filter((service) => service.price_range.min <= maxPrice);
       }
 
       return {
@@ -404,7 +405,7 @@ export class ServiceCatalogServer implements MCPServer {
         .slice(0, 5)
         .map(({ score, ...service }) => ({
           service,
-          confidence: Math.min(score / 20, 1.0),
+          confidence: Math.min(score / 20, 1),
           reasons: this.generateReasons(service, params),
         }));
 

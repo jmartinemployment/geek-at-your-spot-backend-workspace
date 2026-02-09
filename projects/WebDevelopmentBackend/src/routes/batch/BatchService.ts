@@ -181,7 +181,7 @@ export class BatchService {
    * Update batch status based on job statuses
    */
   private updateBatchStatus(batch: BatchJob): void {
-    const jobs = batch.jobs.map((id) => this.queue.getJob(id)).filter(Boolean) as Job[];
+    const jobs = batch.jobs.map((id) => this.queue.getJob(id)).filter((j): j is Job => j !== undefined);
 
     const completedJobs = jobs.filter(
       (j) => j.status === 'completed' || j.status === 'failed' || j.status === 'cancelled'

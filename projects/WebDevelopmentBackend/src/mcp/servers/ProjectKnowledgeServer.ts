@@ -29,101 +29,101 @@ export class ProjectKnowledgeServer implements MCPServer {
   }
 
   private initializeTools() {
-    // Tool 1: Search Past Projects
-    this.tools.push({
-      name: 'search_past_projects',
-      description: 'Search completed projects by type, budget, technologies, and features. Returns similar projects with costs, timelines, and satisfaction scores.',
-      input_schema: {
-        type: 'object',
-        properties: {
-          query: {
-            type: 'string',
-            description: 'Search query for project name or description',
-          },
-          project_type: {
-            type: 'string',
-            enum: ['website', 'mobile_app', 'ecommerce', 'api', 'custom'],
-            description: 'Type of project to search for',
-          },
-          budget_range: {
-            type: 'object',
-            properties: {
-              min: { type: 'number' },
-              max: { type: 'number' },
+    this.tools.push(
+      // Tool 1: Search Past Projects
+      {
+        name: 'search_past_projects',
+        description: 'Search completed projects by type, budget, technologies, and features. Returns similar projects with costs, timelines, and satisfaction scores.',
+        input_schema: {
+          type: 'object',
+          properties: {
+            query: {
+              type: 'string',
+              description: 'Search query for project name or description',
             },
-            description: 'Budget range filter',
-          },
-          technologies: {
-            type: 'array',
-            items: { type: 'string' },
-            description: 'Required technologies (e.g., ["React", "Node.js"])',
-          },
-          complexity: {
-            type: 'string',
-            enum: ['low', 'medium', 'high'],
-            description: 'Project complexity level',
-          },
-          limit: {
-            type: 'number',
-            description: 'Maximum number of results (default: 10)',
-          },
-        },
-      },
-    });
-
-    // Tool 2: Get Project Statistics
-    this.tools.push({
-      name: 'get_project_statistics',
-      description: 'Get aggregate statistics about completed projects including average costs, durations, satisfaction scores, and technology usage patterns.',
-      input_schema: {
-        type: 'object',
-        properties: {
-          project_type: {
-            type: 'string',
-            enum: ['website', 'mobile_app', 'ecommerce', 'api', 'custom', 'all'],
-            description: 'Filter statistics by project type (default: all)',
-          },
-          date_range: {
-            type: 'object',
-            properties: {
-              start: { type: 'string', format: 'date' },
-              end: { type: 'string', format: 'date' },
+            project_type: {
+              type: 'string',
+              enum: ['website', 'mobile_app', 'ecommerce', 'api', 'custom'],
+              description: 'Type of project to search for',
             },
-            description: 'Date range for statistics',
+            budget_range: {
+              type: 'object',
+              properties: {
+                min: { type: 'number' },
+                max: { type: 'number' },
+              },
+              description: 'Budget range filter',
+            },
+            technologies: {
+              type: 'array',
+              items: { type: 'string' },
+              description: 'Required technologies (e.g., ["React", "Node.js"])',
+            },
+            complexity: {
+              type: 'string',
+              enum: ['low', 'medium', 'high'],
+              description: 'Project complexity level',
+            },
+            limit: {
+              type: 'number',
+              description: 'Maximum number of results (default: 10)',
+            },
           },
         },
       },
-    });
-
-    // Tool 3: Get Technology Recommendations
-    this.tools.push({
-      name: 'get_technology_recommendations',
-      description: 'Get technology stack recommendations based on project requirements and historical success rates. Includes pros, cons, and confidence scores.',
-      input_schema: {
-        type: 'object',
-        properties: {
-          project_type: {
-            type: 'string',
-            enum: ['website', 'mobile_app', 'ecommerce', 'api', 'custom'],
-            description: 'Type of project',
-          },
-          requirements: {
-            type: 'array',
-            items: { type: 'string' },
-            description: 'Project requirements (e.g., ["real-time updates", "payment processing"])',
-          },
-          budget: {
-            type: 'number',
-            description: 'Project budget (affects recommendations)',
-          },
-          timeline_weeks: {
-            type: 'number',
-            description: 'Target timeline in weeks',
+      // Tool 2: Get Project Statistics
+      {
+        name: 'get_project_statistics',
+        description: 'Get aggregate statistics about completed projects including average costs, durations, satisfaction scores, and technology usage patterns.',
+        input_schema: {
+          type: 'object',
+          properties: {
+            project_type: {
+              type: 'string',
+              enum: ['website', 'mobile_app', 'ecommerce', 'api', 'custom', 'all'],
+              description: 'Filter statistics by project type (default: all)',
+            },
+            date_range: {
+              type: 'object',
+              properties: {
+                start: { type: 'string', format: 'date' },
+                end: { type: 'string', format: 'date' },
+              },
+              description: 'Date range for statistics',
+            },
           },
         },
-        required: ['project_type'],
       },
-    });
+      // Tool 3: Get Technology Recommendations
+      {
+        name: 'get_technology_recommendations',
+        description: 'Get technology stack recommendations based on project requirements and historical success rates. Includes pros, cons, and confidence scores.',
+        input_schema: {
+          type: 'object',
+          properties: {
+            project_type: {
+              type: 'string',
+              enum: ['website', 'mobile_app', 'ecommerce', 'api', 'custom'],
+              description: 'Type of project',
+            },
+            requirements: {
+              type: 'array',
+              items: { type: 'string' },
+              description: 'Project requirements (e.g., ["real-time updates", "payment processing"])',
+            },
+            budget: {
+              type: 'number',
+              description: 'Project budget (affects recommendations)',
+            },
+            timeline_weeks: {
+              type: 'number',
+              description: 'Target timeline in weeks',
+            },
+          },
+          required: ['project_type'],
+        },
+      },
+    );
 
     // Register handlers
     this.handlers.set('search_past_projects', this.searchPastProjects.bind(this));
@@ -337,7 +337,7 @@ export class ProjectKnowledgeServer implements MCPServer {
       const similarProjects = await context.prisma.project.findMany({
         where: {
           type: project_type,
-          clientSatisfaction: { gte: 4.0 },
+          clientSatisfaction: { gte: 4 },
         },
         select: {
           technologies: true,
@@ -372,7 +372,7 @@ export class ProjectKnowledgeServer implements MCPServer {
           const avgCost = data.avgCost / count;
           const avgDuration = data.avgDuration / count;
 
-          const confidence = Math.min((count / similarProjects.length) * successRate * 0.2, 1.0);
+          const confidence = Math.min((count / similarProjects.length) * successRate * 0.2, 1);
 
           const reasons: string[] = [];
           if (successRate > 4.5) reasons.push('Very high client satisfaction');

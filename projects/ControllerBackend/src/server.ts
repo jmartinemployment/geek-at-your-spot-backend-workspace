@@ -63,7 +63,7 @@ app.post('/api/email', async (req, res) => {
 
     // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (emailRegex.exec(email) === null) {
       return res.status(400).json({
         success: false,
         message: 'Invalid email address'
@@ -157,8 +157,11 @@ app.get('/api/conversations', (req, res) => {
 // Proxy routes
 
 function buildProxyUrl(baseUrl: string, path: string): string {
-  const url = new URL(baseUrl);
-  url.pathname = path;
+  const base = new URL(baseUrl);
+  const url = new URL(path, base.origin);
+  if (url.origin !== base.origin) {
+    throw new Error(`URL origin mismatch: expected ${base.origin}, got ${url.origin}`);
+  }
   return url.href;
 }
 

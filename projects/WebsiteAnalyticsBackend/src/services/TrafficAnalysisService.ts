@@ -42,6 +42,10 @@ export class TrafficAnalysisService {
   }
 
   private buildTrafficPrompt(data: TrafficData): string {
+    const topPagesSection = data.topPages
+      ? `Top Pages:\n${data.topPages.map(p => `- ${p.page}: ${p.views} views`).join('\n')}`
+      : '';
+
     return `Analyze this website traffic data:
 
 Page Views: ${data.pageViews}
@@ -50,7 +54,7 @@ Bounce Rate: ${data.bounceRate}%
 Avg Session Duration: ${data.avgSessionDuration} seconds
 Time Range: ${data.timeRange || 'Not specified'}
 
-${data.topPages ? `Top Pages:\n${data.topPages.map(p => `- ${p.page}: ${p.views} views`).join('\n')}` : ''}
+${topPagesSection}
 
 Provide:
 1. Brief summary of traffic performance
@@ -68,8 +72,8 @@ Format as JSON with keys: summary, insights (array), recommendations (array), me
       if (jsonMatch) {
         return JSON.parse(jsonMatch[0]);
       }
-    } catch (e) {
-      // Fallback
+    } catch {
+      // Expected: AI response may not contain valid JSON; fall back to raw text
     }
 
     return {

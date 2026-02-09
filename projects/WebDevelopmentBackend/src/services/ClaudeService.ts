@@ -144,8 +144,8 @@ Be conversational, not robotic. Show genuine interest in helping them succeed.`;
    */
   calculateCost(tokenCount: number): number {
     // Claude Sonnet 4 pricing (approximate)
-    const inputCostPer1M = 3.0;   // $3 per million input tokens
-    const outputCostPer1M = 15.0; // $15 per million output tokens
+    const inputCostPer1M = 3;   // $3 per million input tokens
+    const outputCostPer1M = 15; // $15 per million output tokens
 
     // Simplified: assume 50/50 split input/output
     const avgCostPer1M = (inputCostPer1M + outputCostPer1M) / 2;

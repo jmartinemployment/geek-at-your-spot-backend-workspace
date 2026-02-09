@@ -169,71 +169,9 @@ export class CodeExecutionService {
 
     for (const rule of rules) {
       const value = this.getNestedValue(data, rule.field);
-
-      switch (rule.rule) {
-        case 'required':
-          if (value === undefined || value === null || value === '') {
-            errors.push({
-              field: rule.field,
-              message: rule.message,
-              value,
-            });
-          }
-          break;
-
-        case 'min':
-          if (typeof value === 'number' && value < rule.value) {
-            errors.push({
-              field: rule.field,
-              message: rule.message,
-              value,
-            });
-          } else if (typeof value === 'string' && value.length < rule.value) {
-            errors.push({
-              field: rule.field,
-              message: rule.message,
-              value,
-            });
-          }
-          break;
-
-        case 'max':
-          if (typeof value === 'number' && value > rule.value) {
-            errors.push({
-              field: rule.field,
-              message: rule.message,
-              value,
-            });
-          } else if (typeof value === 'string' && value.length > rule.value) {
-            errors.push({
-              field: rule.field,
-              message: rule.message,
-              value,
-            });
-          }
-          break;
-
-        case 'pattern':
-          if (typeof value === 'string' && rule.value instanceof RegExp) {
-            if (!rule.value.test(value)) {
-              errors.push({
-                field: rule.field,
-                message: rule.message,
-                value,
-              });
-            }
-          }
-          break;
-
-        case 'custom':
-          if (rule.validator && !rule.validator(value)) {
-            errors.push({
-              field: rule.field,
-              message: rule.message,
-              value,
-            });
-          }
-          break;
+      const error = this.validateRule(rule, value);
+      if (error) {
+        errors.push(error);
       }
     }
 
@@ -241,6 +179,84 @@ export class CodeExecutionService {
       valid: errors.length === 0,
       errors,
     };
+  }
+
+  /**
+   * Validate a single rule against a value
+   */
+  private validateRule(
+    rule: ValidationRule,
+    value: any
+  ): { field: string; message: string; value?: any } | null {
+    switch (rule.rule) {
+      case 'required':
+        return this.validateRequired(rule, value);
+      case 'min':
+        return this.validateBound(rule, value, 'min');
+      case 'max':
+        return this.validateBound(rule, value, 'max');
+      case 'pattern':
+        return this.validatePattern(rule, value);
+      case 'custom':
+        return this.validateCustom(rule, value);
+      default:
+        return null;
+    }
+  }
+
+  private validateRequired(
+    rule: ValidationRule,
+    value: any
+  ): { field: string; message: string; value?: any } | null {
+    if (value === undefined || value === null || value === '') {
+      return { field: rule.field, message: rule.message, value };
+    }
+    return null;
+  }
+
+  private validateBound(
+    rule: ValidationRule,
+    value: any,
+    direction: 'min' | 'max'
+  ): { field: string; message: string; value?: any } | null {
+    const numericValue = typeof value === 'number' ? value : undefined;
+    const lengthValue = typeof value === 'string' ? value.length : undefined;
+    const comparable = numericValue ?? lengthValue;
+
+    if (comparable === undefined) {
+      return null;
+    }
+
+    const exceeded = direction === 'min'
+      ? comparable < rule.value
+      : comparable > rule.value;
+
+    if (exceeded) {
+      return { field: rule.field, message: rule.message, value };
+    }
+    return null;
+  }
+
+  private validatePattern(
+    rule: ValidationRule,
+    value: any
+  ): { field: string; message: string; value?: any } | null {
+    if (typeof value === 'string' && rule.value instanceof RegExp) {
+      if (rule.value.exec(value) === null) {
+        return { field: rule.field, message: rule.message, value };
+      }
+    }
+    return null;
+  }
+
+  private validateCustom(
+    rule: ValidationRule,
+    value: any
+  ): { field: string; message: string; value?: any } | null {
+    if (rule.validator && !rule.validator(value)) {
+      return { field: rule.field, message: rule.message, value };
+    }
+    return null;
   }
 
   /**

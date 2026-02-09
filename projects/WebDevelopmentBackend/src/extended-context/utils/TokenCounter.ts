@@ -85,7 +85,7 @@ export class TokenCounter {
     ];
 
     for (const pattern of codePatterns) {
-      if (pattern.test(text)) {
+      if (pattern.exec(text) !== null) {
         return 'code';
       }
     }
@@ -206,43 +206,16 @@ export class TokenCounter {
           currentTokens = 0;
         }
 
-        const words = sentence.split(' ');
-        let wordChunk = '';
-        let wordTokens = 0;
-
-        for (const word of words) {
-          const wordToken = this.countTokens(word + ' ');
-
-          if (wordTokens + wordToken > maxTokensPerChunk) {
-            chunks.push(wordChunk.trim());
-            wordChunk = word + ' ';
-            wordTokens = wordToken;
-          } else {
-            wordChunk += word + ' ';
-            wordTokens += wordToken;
-          }
-        }
-
-        if (wordChunk) {
-          chunks.push(wordChunk.trim());
-        }
-
+        this.splitSentenceByWords(sentence, maxTokensPerChunk, chunks);
         continue;
       }
 
       // Check if adding sentence would exceed limit
       if (currentTokens + sentenceTokens > maxTokensPerChunk && currentChunk) {
         chunks.push(currentChunk);
-
-        // Handle overlap
-        if (overlapTokens > 0) {
-          const overlapText = this.getLastNTokens(currentChunk, overlapTokens);
-          currentChunk = overlapText + sentence;
-          currentTokens = this.countTokens(currentChunk);
-        } else {
-          currentChunk = sentence;
-          currentTokens = sentenceTokens;
-        }
+        ({ currentChunk, currentTokens } = this.startNewChunk(
+          currentChunk, sentence, sentenceTokens, overlapTokens
+        ));
       } else {
         currentChunk += sentence;
         currentTokens += sentenceTokens;
@@ -255,6 +228,53 @@ export class TokenCounter {
     }
 
     return chunks;
+  }
+
+  /**
+   * Split a single sentence by words when it exceeds the token limit
+   */
+  private static splitSentenceByWords(
+    sentence: string,
+    maxTokensPerChunk: number,
+    chunks: string[]
+  ): void {
+    const words = sentence.split(' ');
+    let wordChunk = '';
+    let wordTokens = 0;
+
+    for (const word of words) {
+      const wordToken = this.countTokens(word + ' ');
+
+      if (wordTokens + wordToken > maxTokensPerChunk) {
+        chunks.push(wordChunk.trim());
+        wordChunk = word + ' ';
+        wordTokens = wordToken;
+      } else {
+        wordChunk += word + ' ';
+        wordTokens += wordToken;
+      }
+    }
+
+    if (wordChunk) {
+      chunks.push(wordChunk.trim());
+    }
+  }
+
+  /**
+   * Start a new chunk, optionally with overlap from the previous chunk
+   */
+  private static startNewChunk(
+    previousChunk: string,
+    sentence: string,
+    sentenceTokens: number,
+    overlapTokens: number
+  ): { currentChunk: string; currentTokens: number } {
+    if (overlapTokens > 0) {
+      const overlapText = this.getLastNTokens(previousChunk, overlapTokens);
+      const currentChunk = overlapText + sentence;
+      return { currentChunk, currentTokens: this.countTokens(currentChunk) };
+    }
+    return { currentChunk: sentence, currentTokens: sentenceTokens };
   }
 
   /**

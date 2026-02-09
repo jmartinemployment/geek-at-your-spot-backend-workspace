@@ -65,8 +65,8 @@ Format as JSON with keys: score, analysis, recommendations (array), keywords (ob
       if (jsonMatch) {
         return JSON.parse(jsonMatch[0]);
       }
-    } catch (e) {
-      // Fallback
+    } catch {
+      // Expected: AI response may not contain valid JSON; fall back to defaults
     }
 
     return {

@@ -15,12 +15,12 @@ export class CostCalculator {
 
   private readonly complexityMultipliers = {
     low: 0.8,
-    medium: 1.0,
+    medium: 1,
     high: 1.3,
   };
 
   private readonly projectTypeMultipliers = {
-    website: 1.0,
+    website: 1,
     mobile_app: 1.2,
     ecommerce: 1.3,
     api: 0.9,

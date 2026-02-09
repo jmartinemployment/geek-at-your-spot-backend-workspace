@@ -70,7 +70,7 @@ export class MCPClient {
         const response = await this.client.messages.create({
           model: this.config.model || 'claude-sonnet-4-20250514',
           max_tokens: this.config.maxTokens || 4096,
-          temperature: options.temperature ?? this.config.temperature ?? 1.0,
+          temperature: options.temperature ?? this.config.temperature ?? 1,
           system: options.systemPrompt,
           messages: currentMessages.map((msg) => ({
             role: msg.role,
@@ -123,15 +123,16 @@ export class MCPClient {
         }
 
         // Add assistant response and tool results to conversation
-        currentMessages.push({
-          role: 'assistant',
-          content: JSON.stringify(response.content),
-        });
-
-        currentMessages.push({
-          role: 'user',
-          content: JSON.stringify(toolResults),
-        });
+        currentMessages.push(
+          {
+            role: 'assistant',
+            content: JSON.stringify(response.content),
+          },
+          {
+            role: 'user',
+            content: JSON.stringify(toolResults),
+          },
+        );
       }
 
       // Max tool uses reached
@@ -160,7 +161,7 @@ export class MCPClient {
       const response = await this.client.messages.create({
         model: this.config.model || 'claude-sonnet-4-20250514',
         max_tokens: this.config.maxTokens || 4096,
-        temperature: this.config.temperature ?? 1.0,
+        temperature: this.config.temperature ?? 1,
         system: systemPrompt,
         messages: [
           {

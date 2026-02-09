@@ -50,7 +50,8 @@ export class AnthropicHelper {
       if (jsonMatch) {
         return JSON.parse(jsonMatch[0]);
       }
-    } catch (e) {
+    } catch {
+      // Expected: AI response may not contain valid JSON
       return null;
     }
     return null;

@@ -235,11 +235,13 @@ export class JobProcessor {
    * Add event listener
    */
   on(eventType: JobEventType, listener: (event: JobEvent) => void): void {
-    if (!this.eventListeners.has(eventType)) {
-      this.eventListeners.set(eventType, []);
+    const existing = this.eventListeners.get(eventType);
+    const listeners = existing ?? [];
+    if (!existing) {
+      this.eventListeners.set(eventType, listeners);
     }
 
-    this.eventListeners.get(eventType)!.push(listener);
+    listeners.push(listener);
   }
 
   /**
@@ -305,7 +307,7 @@ export class DefaultProcessors {
   /**
    * Code execution processor
    */
-  static codeExecution: JobProcessorFn = async (job, context) => {
+  static readonly codeExecution: JobProcessorFn = async (job, context) => {
     context.log('Starting code execution');
 
     const { language } = job.data;
@@ -330,7 +332,7 @@ export class DefaultProcessors {
   /**
    * Cost calculation processor
    */
-  static costCalculation: JobProcessorFn = async (_job, context) => {
+  static readonly costCalculation: JobProcessorFn = async (_job, context) => {
     context.log('Starting cost calculation');
 
     // Import cost calculator
@@ -352,7 +354,7 @@ export class DefaultProcessors {
   /**
    * Timeline generation processor
    */
-  static timelineGeneration: JobProcessorFn = async (_job, context) => {
+  static readonly timelineGeneration: JobProcessorFn = async (_job, context) => {
     context.log('Generating timeline');
 
     context.updateProgress(50);
@@ -372,7 +374,7 @@ export class DefaultProcessors {
   /**
    * Feasibility check processor
    */
-  static feasibilityCheck: JobProcessorFn = async (_job, context) => {
+  static readonly feasibilityCheck: JobProcessorFn = async (_job, context) => {
     context.log('Checking feasibility');
 
     context.updateProgress(50);
@@ -393,7 +395,7 @@ export class DefaultProcessors {
   /**
    * A2A workflow processor
    */
-  static a2aWorkflow: JobProcessorFn = async (job, context) => {
+  static readonly a2aWorkflow: JobProcessorFn = async (job, context) => {
     context.log('Starting A2A workflow');
 
     const { agents } = job.data;
@@ -422,10 +424,8 @@ export class DefaultProcessors {
   /**
    * Context compression processor
    */
-  static contextCompression: JobProcessorFn = async (job, context) => {
+  static readonly contextCompression: JobProcessorFn = async (_job, context) => {
     context.log('Starting context compression');
-
-    void job.data;
 
     context.updateProgress(50);
 
@@ -445,7 +445,7 @@ export class DefaultProcessors {
   /**
    * Bulk analysis processor
    */
-  static bulkAnalysis: JobProcessorFn = async (job, context) => {
+  static readonly bulkAnalysis: JobProcessorFn = async (job, context) => {
     context.log('Starting bulk analysis');
 
     const { items } = job.data;
@@ -477,7 +477,7 @@ export class DefaultProcessors {
   /**
    * Report generation processor
    */
-  static reportGeneration: JobProcessorFn = async (job, context) => {
+  static readonly reportGeneration: JobProcessorFn = async (job, context) => {
     context.log('Generating report');
 
     const { reportType } = job.data;
@@ -503,7 +503,7 @@ export class DefaultProcessors {
   /**
    * Data export processor
    */
-  static dataExport: JobProcessorFn = async (job, context) => {
+  static readonly dataExport: JobProcessorFn = async (job, context) => {
     context.log('Exporting data');
 
     const { format } = job.data;

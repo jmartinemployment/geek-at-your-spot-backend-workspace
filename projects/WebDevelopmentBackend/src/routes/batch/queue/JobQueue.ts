@@ -87,7 +87,8 @@ export class JobQueue {
     job.status = 'queued';
     job.updatedAt = new Date();
 
-    const queue = this.queues.get(job.priority)!;
+    const queue = this.queues.get(job.priority);
+    if (!queue) return;
     queue.push(job);
 
     // Sort queue by creation time (FIFO within priority)
@@ -107,10 +108,12 @@ export class JobQueue {
     const priorities: JobPriority[] = ['critical', 'high', 'normal', 'low'];
 
     for (const priority of priorities) {
-      const queue = this.queues.get(priority)!;
+      const queue = this.queues.get(priority);
+      if (!queue) continue;
 
       if (queue.length > 0) {
-        const job = queue.shift()!;
+        const job = queue.shift();
+        if (!job) continue;
 
         // Check if dependencies are satisfied
         if (this.areDependenciesSatisfied(job)) {
@@ -158,7 +161,15 @@ export class JobQueue {
       throw new Error(`Job not found: ${jobId}`);
     }
 
-    // Update fields
+    this.applyJobFields(job, update);
+    job.updatedAt = new Date();
+    this.handleStatusTransition(jobId, job, update);
+  }
+
+  /**
+   * Apply update fields to a job
+   */
+  private applyJobFields(job: Job, update: JobUpdate): void {
     if (update.status) {
       job.status = update.status;
     }
@@ -186,10 +197,12 @@ export class JobQueue {
     if (update.completedAt) {
       job.completedAt = update.completedAt;
     }
+  }
 
-    job.updatedAt = new Date();
-
-    // Update statistics
+  /**
+   * Handle statistics and side effects for status transitions
+   */
+  private handleStatusTransition(jobId: string, job: Job, update: JobUpdate): void {
     if (update.status === 'completed') {
       this.stats.totalCompleted++;
       this.processingJobs.delete(jobId);
@@ -199,13 +212,11 @@ export class JobQueue {
         this.stats.totalProcessingTime += duration;
       }
 
-      // Check for jobs waiting on this one
       this.checkDependentJobs(jobId);
     } else if (update.status === 'failed') {
       this.stats.totalFailed++;
       this.processingJobs.delete(jobId);
 
-      // Check if should retry
       if (job.attempts < job.maxAttempts) {
         this.scheduleRetry(job);
       }
@@ -223,7 +234,7 @@ export class JobQueue {
     job.updatedAt = new Date();
 
     // Calculate retry delay (exponential backoff)
-    const delay = job.retryDelay! * Math.pow(2, job.attempts - 1);
+    const delay = (job.retryDelay ?? this.config.retryDelay) * Math.pow(2, job.attempts - 1);
 
     setTimeout(() => {
       if (this.jobs.has(job.id)) {
@@ -261,65 +272,88 @@ export class JobQueue {
   getJobs(filter?: JobFilterOptions): Job[] {
     let jobs = Array.from(this.jobs.values());
 
-    if (filter) {
-      // Filter by status
-      if (filter.status) {
-        const statuses = Array.isArray(filter.status) ? filter.status : [filter.status];
-        jobs = jobs.filter((job) => statuses.includes(job.status));
-      }
+    if (!filter) {
+      return jobs;
+    }
 
-      // Filter by type
-      if (filter.type) {
-        const types = Array.isArray(filter.type) ? filter.type : [filter.type];
-        jobs = jobs.filter((job) => types.includes(job.type));
-      }
+    jobs = this.applyFieldFilters(jobs, filter);
+    jobs = this.applyDateFilters(jobs, filter);
+    jobs = this.applySortAndPagination(jobs, filter);
 
-      // Filter by priority
-      if (filter.priority) {
-        const priorities = Array.isArray(filter.priority)
-          ? filter.priority
-          : [filter.priority];
-        jobs = jobs.filter((job) => priorities.includes(job.priority));
-      }
+    return jobs;
+  }
 
-      // Filter by userId
-      if (filter.userId) {
-        jobs = jobs.filter((job) => job.userId === filter.userId);
-      }
+  /**
+   * Apply status, type, priority, and userId filters
+   */
+  private applyFieldFilters(jobs: Job[], filter: JobFilterOptions): Job[] {
+    if (filter.status) {
+      const statuses = Array.isArray(filter.status) ? filter.status : [filter.status];
+      jobs = jobs.filter((job) => statuses.includes(job.status));
+    }
 
-      // Filter by date range
-      if (filter.createdAfter) {
-        jobs = jobs.filter((job) => job.createdAt >= filter.createdAfter!);
-      }
+    if (filter.type) {
+      const types = Array.isArray(filter.type) ? filter.type : [filter.type];
+      jobs = jobs.filter((job) => types.includes(job.type));
+    }
 
-      if (filter.createdBefore) {
-        jobs = jobs.filter((job) => job.createdAt <= filter.createdBefore!);
-      }
+    if (filter.priority) {
+      const priorities = Array.isArray(filter.priority)
+        ? filter.priority
+        : [filter.priority];
+      jobs = jobs.filter((job) => priorities.includes(job.priority));
+    }
 
-      // Sort
-      if (filter.sortBy) {
-        jobs.sort((a, b) => {
-          const aValue = a[filter.sortBy!];
-          const bValue = b[filter.sortBy!];
+    if (filter.userId) {
+      jobs = jobs.filter((job) => job.userId === filter.userId);
+    }
 
-          if (aValue instanceof Date && bValue instanceof Date) {
-            return filter.sortOrder === 'desc'
-              ? bValue.getTime() - aValue.getTime()
-              : aValue.getTime() - bValue.getTime();
-          }
+    return jobs;
+  }
 
-          return 0;
-        });
-      }
+  /**
+   * Apply date range filters
+   */
+  private applyDateFilters(jobs: Job[], filter: JobFilterOptions): Job[] {
+    if (filter.createdAfter) {
+      const createdAfter = filter.createdAfter;
+      jobs = jobs.filter((job) => job.createdAt >= createdAfter);
+    }
 
-      // Pagination
-      if (filter.offset) {
-        jobs = jobs.slice(filter.offset);
-      }
+    if (filter.createdBefore) {
+      const createdBefore = filter.createdBefore;
+      jobs = jobs.filter((job) => job.createdAt <= createdBefore);
+    }
 
-      if (filter.limit) {
-        jobs = jobs.slice(0, filter.limit);
-      }
+    return jobs;
+  }
+
+  /**
+   * Apply sorting and pagination
+   */
+  private applySortAndPagination(jobs: Job[], filter: JobFilterOptions): Job[] {
+    if (filter.sortBy) {
+      const sortBy = filter.sortBy;
+      jobs.sort((a, b) => {
+        const aValue = a[sortBy];
+        const bValue = b[sortBy];
+
+        if (aValue instanceof Date && bValue instanceof Date) {
+          return filter.sortOrder === 'desc'
+            ? bValue.getTime() - aValue.getTime()
+            : aValue.getTime() - bValue.getTime();
+        }
+
+        return 0;
+      });
+    }
+
+    if (filter.offset) {
+      jobs = jobs.slice(filter.offset);
+    }
+
+    if (filter.limit) {
+      jobs = jobs.slice(0, filter.limit);
     }
 
     return jobs;
@@ -341,10 +375,12 @@ export class JobQueue {
 
     // Remove from queue if queued
     if (job.status === 'queued') {
-      const queue = this.queues.get(job.priority)!;
-      const index = queue.findIndex((j) => j.id === jobId);
-      if (index !== -1) {
-        queue.splice(index, 1);
+      const queue = this.queues.get(job.priority);
+      if (queue) {
+        const index = queue.findIndex((j) => j.id === jobId);
+        if (index !== -1) {
+          queue.splice(index, 1);
+        }
       }
     }
 

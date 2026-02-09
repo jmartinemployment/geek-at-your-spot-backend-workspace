@@ -47,7 +47,7 @@ export class FeasibilityChecker {
   // Team experience multipliers
   private readonly experienceMultipliers = {
     junior: 1.5,
-    mid: 1.0,
+    mid: 1,
     senior: 0.8,
   };
 
@@ -93,19 +93,19 @@ export class FeasibilityChecker {
     const technicalConstraints = this.identifyTechnicalConstraints(input);
 
     // Suggest alternatives if not feasible
-    const alternativeApproaches = !feasible
-      ? this.suggestAlternativeApproaches(input, risks)
-      : undefined;
+    const alternativeApproaches = feasible
+      ? undefined
+      : this.suggestAlternativeApproaches(input, risks);
 
     return {
       feasible,
       overallScore,
-      risks: risks.sort((a, b) => {
-        const levelOrder = { critical: 4, high: 3, medium: 2, low: 1 };
+      risks: [...risks].sort((a, b) => {
+        const levelOrder: Record<string, number> = { critical: 4, high: 3, medium: 2, low: 1 };
         return levelOrder[b.level] - levelOrder[a.level];
       }),
-      recommendations: recommendations.sort((a, b) => {
-        const priorityOrder = { high: 3, medium: 2, low: 1 };
+      recommendations: [...recommendations].sort((a, b) => {
+        const priorityOrder: Record<string, number> = { high: 3, medium: 2, low: 1 };
         return priorityOrder[b.priority] - priorityOrder[a.priority];
       }),
       technicalConstraints,
@@ -456,18 +456,24 @@ export class FeasibilityChecker {
     const alternatives: string[] = [];
 
     if (risks.some(r => r.category === 'Budget' && r.level === 'critical')) {
-      alternatives.push('Phased MVP approach: Launch with core features, add advanced features later');
-      alternatives.push('Use no-code/low-code platforms for initial version');
+      alternatives.push(
+        'Phased MVP approach: Launch with core features, add advanced features later',
+        'Use no-code/low-code platforms for initial version',
+      );
     }
 
     if (risks.some(r => r.category === 'Feature Complexity')) {
-      alternatives.push('Leverage third-party services for complex features (e.g., Stripe for payments, Twilio for SMS)');
-      alternatives.push('Consider open-source solutions to accelerate development');
+      alternatives.push(
+        'Leverage third-party services for complex features (e.g., Stripe for payments, Twilio for SMS)',
+        'Consider open-source solutions to accelerate development',
+      );
     }
 
     if (risks.some(r => r.category === 'Timeline')) {
-      alternatives.push('Increase team size to parallelize development');
-      alternatives.push('Reduce feature scope to meet timeline');
+      alternatives.push(
+        'Increase team size to parallelize development',
+        'Reduce feature scope to meet timeline',
+      );
     }
 
     return alternatives;
@@ -490,7 +496,7 @@ export class FeasibilityChecker {
     // Apply team experience multiplier
     const experienceMult = input.constraints?.teamExperience
       ? this.experienceMultipliers[input.constraints.teamExperience]
-      : 1.0;
+      : 1;
 
     return Math.round(totalHours * baseRate * experienceMult);
   }
@@ -508,7 +514,7 @@ export class FeasibilityChecker {
     // Apply team experience multiplier
     const experienceMult = input.constraints?.teamExperience
       ? this.experienceMultipliers[input.constraints.teamExperience]
-      : 1.0;
+      : 1;
 
     return Math.ceil(weeks * experienceMult);
   }

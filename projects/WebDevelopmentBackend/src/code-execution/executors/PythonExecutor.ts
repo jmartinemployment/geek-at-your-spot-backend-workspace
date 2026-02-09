@@ -77,7 +77,7 @@ export class PythonExecutor {
       return {
         success: result.exitCode === 0,
         output: output.result,
-        error: result.exitCode !== 0 ? result.stderr : undefined,
+        error: result.exitCode === 0 ? undefined : result.stderr,
         executionTime,
         logs: [...output.logs, ...errorLogs],
       };
@@ -131,7 +131,7 @@ if __name__ == '__main__':
 
       return {
         valid: result.exitCode === 0,
-        error: result.exitCode !== 0 ? result.stderr : undefined,
+        error: result.exitCode === 0 ? undefined : result.stderr,
       };
     } catch (error: unknown) {
       return {

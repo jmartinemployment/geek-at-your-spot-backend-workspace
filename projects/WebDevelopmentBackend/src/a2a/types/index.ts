@@ -175,7 +175,7 @@ export interface OrchestrationResult {
   agentsInvolved: string[];
   tasksCompleted: number;
   totalDuration: number;
-  conversation: ConversationContext;
+  conversation: ConversationContext | null;
   error?: string;
 }
 

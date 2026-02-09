@@ -60,8 +60,8 @@ Format as JSON with keys: currentPerformance, optimizations (array), projectedIm
       if (jsonMatch) {
         return JSON.parse(jsonMatch[0]);
       }
-    } catch (e) {
-      // Fallback
+    } catch {
+      // Expected: AI response may not contain valid JSON; fall back to raw text
     }
 
     return {

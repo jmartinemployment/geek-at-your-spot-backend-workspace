@@ -185,7 +185,7 @@ export class JavaScriptExecutor {
   private stringify(value: any): string {
     try {
       if (typeof value === 'string') return value;
-      if (typeof value === 'undefined') return 'undefined';
+      if (value === undefined) return 'undefined';
       if (value === null) return 'null';
       if (typeof value === 'function') return '[Function]';
       return JSON.stringify(value, null, 2);

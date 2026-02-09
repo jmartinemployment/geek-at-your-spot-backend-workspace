@@ -34,14 +34,9 @@ export type JobType =
   | 'report_generation'
   | 'data_export'
   | 'custom';
-// Export types
-/* export * from './types';
- */
+
 // Export queue
 export { JobQueue } from './queue/JobQueue';
-
-/* // Export processor
-export { JobProcessor, DefaultProcessors } from './processor/JobProcessor'; */
 
 // Export main service
 export { BatchService } from './BatchService';

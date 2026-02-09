@@ -10,7 +10,6 @@ import {
   OrchestrationRequest,
   OrchestrationResult,
   OrchestrationStrategy,
-  ConversationContext,
   AgentTask,
   AgentResponse,
 } from '../types';
@@ -143,7 +142,7 @@ export class Orchestrator {
         agentsInvolved: conversation.participants,
         tasksCompleted: this.conversationManager.getCompletedTasks(conversation.id).length,
         totalDuration,
-        conversation: this.conversationManager.getConversation(conversation.id)!,
+        conversation: this.conversationManager.getConversation(conversation.id) ?? null,
       };
     } catch (error: unknown) {
       const totalDuration = Date.now() - startTime;
@@ -155,7 +154,7 @@ export class Orchestrator {
         agentsInvolved: [],
         tasksCompleted: 0,
         totalDuration,
-        conversation: null as unknown as ConversationContext,
+        conversation: null,
         error: error instanceof Error ? error.message : String(error),
       };
     }

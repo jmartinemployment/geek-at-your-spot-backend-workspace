@@ -7,6 +7,17 @@ import { BaseAgent } from './BaseAgent';
 import { AgentTask } from '../types';
 
 /**
+ * Shared helper: Extract bullet points from text
+ * Used across multiple agent classes to parse structured AI responses.
+ */
+function extractBulletPoints(text: string): string[] {
+  const lines = text.split('\n');
+  return lines
+    .filter(line => /^[-\u2022*]\s+/.exec(line.trim()))
+    .map(line => line.trim().replaceAll(/^[-\u2022*]\s+/g, ''));
+}
+
+/**
  * CoordinatorAgent - Orchestrates multi-agent workflows
  */
 export class CoordinatorAgent extends BaseAgent {
@@ -94,22 +105,15 @@ Provide:
 
     return {
       findings,
-      keyPoints: this.extractKeyPoints(findings),
+      keyPoints: extractBulletPoints(findings),
       recommendations: this.extractRecommendations(findings),
     };
-  }
-
-  private extractKeyPoints(text: string): string[] {
-    const lines = text.split('\n');
-    return lines
-      .filter(line => /^[-•*]\s+/.exec(line.trim()))
-      .map(line => line.trim().replaceAll(/^[-•*]\s+/, ''));
   }
 
   private extractRecommendations(text: string): string[] {
     const recommendationSection = /recommendations?:?([\s\S]*?)(?=\n\n|\n#|$)/i.exec(text);
     if (recommendationSection) {
-      return this.extractKeyPoints(recommendationSection[1]);
+      return extractBulletPoints(recommendationSection[1]);
     }
     return [];
   }
@@ -282,22 +286,15 @@ Provide:
   private extractInsights(text: string): string[] {
     const insightsSection = /insights?:?([\s\S]*?)(?=\n\n|\n#|recommendations|$)/i.exec(text);
     if (insightsSection) {
-      return this.extractKeyPoints(insightsSection[1]);
+      return extractBulletPoints(insightsSection[1]);
     }
     return [];
-  }
-
-  private extractKeyPoints(text: string): string[] {
-    const lines = text.split('\n');
-    return lines
-      .filter(line => /^[-•*]\s+/.exec(line.trim()))
-      .map(line => line.trim().replaceAll(/^[-•*]\s+/, ''));
   }
 
   private extractRecommendations(text: string): string[] {
     const recommendationSection = /recommendations?:?([\s\S]*?)(?=\n\n|\n#|$)/i.exec(text);
     if (recommendationSection) {
-      return this.extractKeyPoints(recommendationSection[1]);
+      return extractBulletPoints(recommendationSection[1]);
     }
     return [];
   }
@@ -386,7 +383,7 @@ Provide:
   private extractTestCases(text: string): string[] {
     const testSection = /test cases?:?([\s\S]*?)(?=\n\n|\n#|quality|$)/i.exec(text);
     if (testSection) {
-      return this.extractKeyPoints(testSection[1]);
+      return extractBulletPoints(testSection[1]);
     }
     return [];
   }
@@ -394,16 +391,9 @@ Provide:
   private extractIssues(text: string): string[] {
     const issuesSection = /issues? found:?([\s\S]*?)(?=\n\n|\n#|recommendations|$)/i.exec(text);
     if (issuesSection) {
-      return this.extractKeyPoints(issuesSection[1]);
+      return extractBulletPoints(issuesSection[1]);
     }
     return [];
-  }
-
-  private extractKeyPoints(text: string): string[] {
-    const lines = text.split('\n');
-    return lines
-      .filter(line => /^[-•*]\s+/.exec(line.trim()))
-      .map(line => line.trim().replaceAll(/^[-•*]\s+/, ''));
   }
 
   private calculateQualityScore(text: string): number {
@@ -457,7 +447,7 @@ Provide:
   private extractMilestones(text: string): string[] {
     const milestoneSection = /milestones?:?([\s\S]*?)(?=\n\n|\n#|resources|$)/i.exec(text);
     if (milestoneSection) {
-      return this.extractKeyPoints(milestoneSection[1]);
+      return extractBulletPoints(milestoneSection[1]);
     }
     return [];
   }
@@ -465,16 +455,9 @@ Provide:
   private extractRisks(text: string): string[] {
     const riskSection = /risks?:?([\s\S]*?)(?=\n\n|\n#|success|$)/i.exec(text);
     if (riskSection) {
-      return this.extractKeyPoints(riskSection[1]);
+      return extractBulletPoints(riskSection[1]);
     }
     return [];
-  }
-
-  private extractKeyPoints(text: string): string[] {
-    const lines = text.split('\n');
-    return lines
-      .filter(line => /^[-•*]\s+/.exec(line.trim()))
-      .map(line => line.trim().replaceAll(/^[-•*]\s+/, ''));
   }
 }
 
@@ -545,16 +528,9 @@ Provide:
   private extractAssumptions(text: string): string[] {
     const assumptionSection = /assumptions?:?([\s\S]*?)(?=\n\n|\n#|risk|$)/i.exec(text);
     if (assumptionSection) {
-      return this.extractKeyPoints(assumptionSection[1]);
+      return extractBulletPoints(assumptionSection[1]);
     }
     return [];
-  }
-
-  private extractKeyPoints(text: string): string[] {
-    const lines = text.split('\n');
-    return lines
-      .filter(line => /^[-•*]\s+/.exec(line.trim()))
-      .map(line => line.trim().replaceAll(/^[-•*]\s+/, ''));
   }
 }
 
@@ -601,7 +577,7 @@ Provide:
   private extractTechStack(text: string): string[] {
     const techSection = /technology stack:?([\s\S]*?)(?=\n\n|\n#|system|$)/i.exec(text);
     if (techSection) {
-      return this.extractKeyPoints(techSection[1]);
+      return extractBulletPoints(techSection[1]);
     }
     return [];
   }
@@ -609,15 +585,8 @@ Provide:
   private extractComponents(text: string): string[] {
     const componentSection = /components?:?([\s\S]*?)(?=\n\n|\n#|data|$)/i.exec(text);
     if (componentSection) {
-      return this.extractKeyPoints(componentSection[1]);
+      return extractBulletPoints(componentSection[1]);
     }
     return [];
-  }
-
-  private extractKeyPoints(text: string): string[] {
-    const lines = text.split('\n');
-    return lines
-      .filter(line => /^[-•*]\s+/.exec(line.trim()))
-      .map(line => line.trim().replaceAll(/^[-•*]\s+/, ''));
   }
 }

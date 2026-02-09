@@ -16,7 +16,7 @@ const router = Router();
 const prisma = new PrismaClient();
 const leadRepo = new LeadRepository(prisma);
 const conversationRepo = new ConversationRepository(prisma);
-const claudeService = new ClaudeService(process.env.ANTHROPIC_API_KEY!);
+const claudeService = new ClaudeService(process.env.ANTHROPIC_API_KEY ?? '');
 
 /**
  * POST /api/chat
@@ -40,7 +40,9 @@ router.post(
       if (leadInfo?.email) {
         lead = await leadRepo.findByEmail(leadInfo.email);
 
-        if (!lead) {
+        if (lead) {
+          logger.info('Found existing lead', { leadId: lead.id });
+        } else {
           logger.info('Creating new lead', { email: leadInfo.email });
           lead = await leadRepo.create({
             name: leadInfo.name || 'Anonymous',
@@ -52,8 +54,6 @@ router.post(
             ipAddress: req.ip,
             userAgent: req.headers['user-agent']
           });
-        } else {
-          logger.info('Found existing lead', { leadId: lead.id });
         }
       }
 

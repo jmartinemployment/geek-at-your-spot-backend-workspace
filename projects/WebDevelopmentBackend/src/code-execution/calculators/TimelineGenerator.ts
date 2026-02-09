@@ -65,7 +65,7 @@ export class TimelineGenerator {
     }
 
     // Calculate totals
-    const totalWeeks = phases[phases.length - 1]?.endWeek || 0;
+    const totalWeeks = phases.at(-1)?.endWeek || 0;
     const totalDays = totalWeeks * workDaysPerWeek;
 
     // Generate warnings

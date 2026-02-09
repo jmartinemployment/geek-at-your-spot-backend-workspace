@@ -141,8 +141,9 @@ export class ContextWindowManager {
     }
 
     if (options?.minImportance !== undefined) {
+      const minImportance = options.minImportance;
       messages = messages.filter(
-        (msg) => (msg.importance || 0) >= options.minImportance!
+        (msg) => (msg.importance || 0) >= minImportance
       );
     }
 
@@ -256,9 +257,9 @@ export class ContextWindowManager {
       compressionRatio: compressionResult.compressionRatio,
     });
 
-    const changes = [
+    const changes: OptimizationResult['changes'] = [
       {
-        type: 'summarized' as const,
+        type: 'summarized',
         messageId: 'summary',
         tokensSaved: originalTokens - window.totalTokens,
       },
@@ -290,15 +291,16 @@ export class ContextWindowManager {
       id: uuidv4(),
       conversationId,
       timestamp: new Date(),
-      window: JSON.parse(JSON.stringify(window)), // Deep copy
+      window: structuredClone(window),
       description,
     };
 
-    if (!this.snapshots.has(conversationId)) {
-      this.snapshots.set(conversationId, []);
+    const existing = this.snapshots.get(conversationId);
+    const snapshots = existing ?? [];
+    if (!existing) {
+      this.snapshots.set(conversationId, snapshots);
     }
 
-    const snapshots = this.snapshots.get(conversationId)!;
     snapshots.push(snapshot);
 
     // Keep only last N snapshots (default: 5)
@@ -334,7 +336,7 @@ export class ContextWindowManager {
     }
 
     // Restore window
-    this.windows.set(conversationId, JSON.parse(JSON.stringify(snapshot.window)));
+    this.windows.set(conversationId, structuredClone(snapshot.window));
 
     this.emitEvent(conversationId, 'rollback_performed', {
       snapshotId,
@@ -479,14 +481,15 @@ export class ContextWindowManager {
       data,
     };
 
-    if (!this.events.has(conversationId)) {
-      this.events.set(conversationId, []);
+    const existingEvents = this.events.get(conversationId);
+    const events = existingEvents ?? [];
+    if (!existingEvents) {
+      this.events.set(conversationId, events);
     }
 
-    this.events.get(conversationId)!.push(event);
+    events.push(event);
 
     // Keep only last 100 events
-    const events = this.events.get(conversationId)!;
     if (events.length > 100) {
       events.shift();
     }

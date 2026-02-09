@@ -26,7 +26,7 @@ export default function ContactFormEmail({
   message,
   phone,
   company,
-}: ContactFormEmailProps) {
+}: Readonly<ContactFormEmailProps>) {
   return (
     <Html>
       <Head />

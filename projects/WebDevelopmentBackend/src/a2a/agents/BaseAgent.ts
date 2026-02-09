@@ -78,7 +78,7 @@ export abstract class BaseAgent {
       const response = await this.client.messages.create({
         model: this.config.model || 'claude-sonnet-4-20250514',
         max_tokens: this.config.maxTokens || 4096,
-        temperature: this.config.temperature ?? 1.0,
+        temperature: this.config.temperature ?? 1,
         system: this.config.systemPrompt,
         messages: [
           {

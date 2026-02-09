@@ -29,12 +29,12 @@ export class PricingServer implements MCPServer {
 
   private readonly complexityMultipliers = {
     low: 0.8,
-    medium: 1.0,
+    medium: 1,
     high: 1.3,
   };
 
   private readonly projectTypeMultipliers = {
-    website: 1.0,
+    website: 1,
     mobile_app: 1.2,
     ecommerce: 1.3,
     api: 0.9,
@@ -130,119 +130,118 @@ export class PricingServer implements MCPServer {
   }
 
   private initializeTools() {
-    this.tools.push({
-      name: 'estimate_project_cost',
-      description: 'Get detailed cost estimation for a project based on type, features, and complexity. Includes breakdown by feature, timeline phases, and confidence score.',
-      input_schema: {
-        type: 'object',
-        properties: {
-          project_type: {
-            type: 'string',
-            enum: ['website', 'mobile_app', 'ecommerce', 'api', 'custom'],
-            description: 'Type of project to estimate',
-          },
-          features: {
-            type: 'array',
-            items: { type: 'string' },
-            description: 'List of required features (use feature IDs from get_feature_pricing)',
-          },
-          complexity: {
-            type: 'string',
-            enum: ['low', 'medium', 'high'],
-            description: 'Overall project complexity (affects all estimates)',
-          },
-          timeline_weeks: {
-            type: 'number',
-            description: 'Target timeline in weeks (affects cost if rushed)',
-          },
-          team_size: {
-            type: 'number',
-            description: 'Estimated team size (affects coordination overhead)',
-          },
-        },
-        required: ['project_type', 'features'],
-      },
-    });
-
-    this.tools.push({
-      name: 'get_feature_pricing',
-      description: 'Get detailed pricing information for specific features. Returns hours, cost, and complexity for each feature.',
-      input_schema: {
-        type: 'object',
-        properties: {
-          features: {
-            type: 'array',
-            items: { type: 'string' },
-            description: 'List of feature IDs to get pricing for',
-          },
-          project_type: {
-            type: 'string',
-            enum: ['website', 'mobile_app', 'ecommerce', 'api', 'custom'],
-            description: 'Project type (affects feature pricing)',
-          },
-        },
-        required: ['features'],
-      },
-    });
-
-    this.tools.push({
-      name: 'compare_pricing_options',
-      description: 'Compare different pricing tiers (MVP, Standard, Premium) for a project. Shows features included in each tier, costs, and recommendations.',
-      input_schema: {
-        type: 'object',
-        properties: {
-          project_type: {
-            type: 'string',
-            enum: ['website', 'mobile_app', 'ecommerce', 'api', 'custom'],
-            description: 'Type of project',
-          },
-          features: {
-            type: 'array',
-            items: { type: 'string' },
-            description: 'Full list of desired features',
-          },
-          options: {
-            type: 'array',
-            items: {
+    this.tools.push(
+      {
+        name: 'estimate_project_cost',
+        description: 'Get detailed cost estimation for a project based on type, features, and complexity. Includes breakdown by feature, timeline phases, and confidence score.',
+        input_schema: {
+          type: 'object',
+          properties: {
+            project_type: {
               type: 'string',
-              enum: ['mvp', 'standard', 'premium'],
+              enum: ['website', 'mobile_app', 'ecommerce', 'api', 'custom'],
+              description: 'Type of project to estimate',
             },
-            description: 'Which options to compare (default: all)',
+            features: {
+              type: 'array',
+              items: { type: 'string' },
+              description: 'List of required features (use feature IDs from get_feature_pricing)',
+            },
+            complexity: {
+              type: 'string',
+              enum: ['low', 'medium', 'high'],
+              description: 'Overall project complexity (affects all estimates)',
+            },
+            timeline_weeks: {
+              type: 'number',
+              description: 'Target timeline in weeks (affects cost if rushed)',
+            },
+            team_size: {
+              type: 'number',
+              description: 'Estimated team size (affects coordination overhead)',
+            },
           },
+          required: ['project_type', 'features'],
         },
-        required: ['project_type', 'features'],
       },
-    });
-
-    this.tools.push({
-      name: 'suggest_cost_optimizations',
-      description: 'Get budget optimization suggestions including phased approach, feature prioritization, and cost-saving alternatives.',
-      input_schema: {
-        type: 'object',
-        properties: {
-          target_budget: {
-            type: 'number',
-            description: 'Target budget in dollars',
+      {
+        name: 'get_feature_pricing',
+        description: 'Get detailed pricing information for specific features. Returns hours, cost, and complexity for each feature.',
+        input_schema: {
+          type: 'object',
+          properties: {
+            features: {
+              type: 'array',
+              items: { type: 'string' },
+              description: 'List of feature IDs to get pricing for',
+            },
+            project_type: {
+              type: 'string',
+              enum: ['website', 'mobile_app', 'ecommerce', 'api', 'custom'],
+              description: 'Project type (affects feature pricing)',
+            },
           },
-          project_type: {
-            type: 'string',
-            enum: ['website', 'mobile_app', 'ecommerce', 'api', 'custom'],
-            description: 'Type of project',
-          },
-          required_features: {
-            type: 'array',
-            items: { type: 'string' },
-            description: 'Must-have features',
-          },
-          optional_features: {
-            type: 'array',
-            items: { type: 'string' },
-            description: 'Nice-to-have features',
-          },
+          required: ['features'],
         },
-        required: ['target_budget', 'project_type', 'required_features'],
       },
-    });
+      {
+        name: 'compare_pricing_options',
+        description: 'Compare different pricing tiers (MVP, Standard, Premium) for a project. Shows features included in each tier, costs, and recommendations.',
+        input_schema: {
+          type: 'object',
+          properties: {
+            project_type: {
+              type: 'string',
+              enum: ['website', 'mobile_app', 'ecommerce', 'api', 'custom'],
+              description: 'Type of project',
+            },
+            features: {
+              type: 'array',
+              items: { type: 'string' },
+              description: 'Full list of desired features',
+            },
+            options: {
+              type: 'array',
+              items: {
+                type: 'string',
+                enum: ['mvp', 'standard', 'premium'],
+              },
+              description: 'Which options to compare (default: all)',
+            },
+          },
+          required: ['project_type', 'features'],
+        },
+      },
+      {
+        name: 'suggest_cost_optimizations',
+        description: 'Get budget optimization suggestions including phased approach, feature prioritization, and cost-saving alternatives.',
+        input_schema: {
+          type: 'object',
+          properties: {
+            target_budget: {
+              type: 'number',
+              description: 'Target budget in dollars',
+            },
+            project_type: {
+              type: 'string',
+              enum: ['website', 'mobile_app', 'ecommerce', 'api', 'custom'],
+              description: 'Type of project',
+            },
+            required_features: {
+              type: 'array',
+              items: { type: 'string' },
+              description: 'Must-have features',
+            },
+            optional_features: {
+              type: 'array',
+              items: { type: 'string' },
+              description: 'Nice-to-have features',
+            },
+          },
+          required: ['target_budget', 'project_type', 'required_features'],
+        },
+      },
+    );
 
     this.handlers.set('estimate_project_cost', this.estimateProjectCost.bind(this));
     this.handlers.set('get_feature_pricing', this.getFeaturePricing.bind(this));
@@ -578,7 +577,7 @@ export class PricingServer implements MCPServer {
     projectType: string,
     complexity: 'low' | 'medium' | 'high' = 'medium'
   ): number {
-    const projectMult = this.projectTypeMultipliers[projectType as keyof typeof this.projectTypeMultipliers] || 1.0;
+    const projectMult = this.projectTypeMultipliers[projectType as keyof typeof this.projectTypeMultipliers] || 1;
     const complexityMult = this.complexityMultipliers[complexity];
 
     const total = features.reduce((sum, featureId) => {
