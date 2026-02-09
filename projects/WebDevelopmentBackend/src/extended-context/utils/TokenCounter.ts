@@ -101,16 +101,14 @@ export class TokenCounter {
 
     // Count emojis (each emoji is typically 1-2 tokens)
     const emojiPattern = /[\u{1F300}-\u{1F9FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu;
-    const emojis = text.match(emojiPattern);
-    if (emojis) {
-      extraTokens += emojis.length;
+    while (emojiPattern.exec(text) !== null) {
+      extraTokens++;
     }
 
     // Count URLs (URLs are more token-dense)
     const urlPattern = /https?:\/\/[^\s]+/g;
-    const urls = text.match(urlPattern);
-    if (urls) {
-      extraTokens += urls.length * 2; // URLs typically use more tokens
+    while (urlPattern.exec(text) !== null) {
+      extraTokens += 2; // URLs typically use more tokens
     }
 
     return extraTokens;
@@ -190,7 +188,15 @@ export class TokenCounter {
     overlapTokens: number = 0
   ): string[] {
     const chunks: string[] = [];
-    const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+    const sentencePattern = /[^.!?]+[.!?]+/g;
+    const sentences: string[] = [];
+    let sentenceMatch: RegExpExecArray | null;
+    while ((sentenceMatch = sentencePattern.exec(text)) !== null) {
+      sentences.push(sentenceMatch[0]);
+    }
+    if (sentences.length === 0) {
+      sentences.push(text);
+    }
 
     let currentChunk = '';
     let currentTokens = 0;

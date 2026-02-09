@@ -319,7 +319,9 @@ export class Orchestrator {
     ];
 
     while (queue.length > 0) {
-      const { agent, response } = queue.shift()!;
+      const entry = queue.shift();
+      if (!entry) break;
+      const { agent, response } = entry;
 
       // Process delegations
       if (response.delegateTo) {

@@ -18,7 +18,7 @@ export async function sendContactEmail(data: ContactFormData) {
     logger.info('Starting email send process');
 
     // Convert comma-separated TO_EMAIL into an array
-    const toEmails = process.env.TO_EMAIL!.split(',').map(email => email.trim());
+    const toEmails = (process.env.TO_EMAIL ?? '').split(',').map(email => email.trim());
 
     logger.info('Email configuration', {
       apiKeyExists: !!process.env.RESEND_API_KEY,

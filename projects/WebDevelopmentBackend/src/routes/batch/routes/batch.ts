@@ -16,7 +16,7 @@ router.post('/jobs', async (req: Request, res: Response) => {
   try {
     const batchService = req.app.locals.batchService as BatchService;
 
-    if (!batchService || !batchService.isEnabled()) {
+    if (!batchService?.isEnabled()) {
       return res.status(400).json({
         error: 'Batch service is not available',
       });

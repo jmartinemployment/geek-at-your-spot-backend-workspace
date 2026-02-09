@@ -291,7 +291,12 @@ export class BatchService {
 
         if (job.status === 'completed' || job.status === 'failed' || job.status === 'cancelled') {
           clearInterval(checkInterval);
-          resolve(this.getJobResult<T>(jobId)!);
+          const result = this.getJobResult<T>(jobId);
+          if (result) {
+            resolve(result);
+          } else {
+            reject(new Error('Job result not available'));
+          }
           return;
         }
 

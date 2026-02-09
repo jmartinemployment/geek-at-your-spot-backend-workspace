@@ -11,7 +11,7 @@ router.post('/messages', async (req: Request, res: Response) => {
   try {
     const extContextService = req.app.locals.extendedContextService as ExtendedContextService;
 
-    if (!extContextService || !extContextService.isEnabled()) {
+    if (!extContextService?.isEnabled()) {
       return res.status(400).json({
         error: 'Extended Context service is not available',
       });

@@ -28,7 +28,7 @@ export async function sendContactEmail(data: ContactFormData) {
   try {
     logger.info('Starting email send process');
     
-    const toEmails = process.env.TO_EMAIL!.split(',').map(email => email.trim());
+    const toEmails = (process.env.TO_EMAIL ?? '').split(',').map(email => email.trim());
     
     logger.info('Email configuration', { from: process.env.FROM_EMAIL, to: toEmails });
 

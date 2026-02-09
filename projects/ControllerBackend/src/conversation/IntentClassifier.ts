@@ -73,8 +73,8 @@ Respond ONLY with JSON:
           reasoning: parsed.reasoning || 'Unable to classify'
         };
       }
-    } catch (e) {
-      logger.error('Failed to parse classification', { error: e });
+    } catch (error: unknown) {
+      logger.error('Failed to parse classification', { error });
     }
 
     return {

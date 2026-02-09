@@ -125,7 +125,7 @@ export class TimelineGenerator {
 
     const calculateEarliestStart = (node: DependencyNode): number => {
       if (earliestStart.has(node.id)) {
-        return earliestStart.get(node.id)!;
+        return earliestStart.get(node.id) ?? 0;
       }
 
       if (node.dependencies.length === 0) {

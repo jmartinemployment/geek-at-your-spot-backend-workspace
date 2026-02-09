@@ -77,8 +77,8 @@ async function main() {
 
 try {
   await main();
-} catch (e) {
-  console.error(e);
+} catch (error: unknown) {
+  console.error(error);
   process.exit(1);
 } finally {
   await prisma.$disconnect();

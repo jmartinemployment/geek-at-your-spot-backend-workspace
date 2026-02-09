@@ -28,7 +28,7 @@ export class CostCalculator {
   };
 
   // Feature hours database
-  private featureHours: Record<string, number> = {
+  private readonly featureHours: Record<string, number> = {
     // Authentication
     user_registration: 8,
     social_login: 12,
@@ -110,7 +110,7 @@ export class CostCalculator {
   };
 
   // Feature dependencies
-  private featureDependencies: Record<string, string[]> = {
+  private readonly featureDependencies: Record<string, string[]> = {
     social_login: ['user_registration'],
     two_factor_auth: ['user_registration'],
     subscription_billing: ['stripe_integration'],

@@ -335,8 +335,13 @@ Provide well-structured, clear, and professional content.
   }
 
   private extractSections(text: string): string[] {
-    const headers = text.match(/^#+\s+.+$/gm);
-    return headers ? headers.map(h => h.replaceAll(/^#+\s+/, '')) : [];
+    const headerPattern = /^#+\s+.+$/gm;
+    const headers: string[] = [];
+    let headerMatch: RegExpExecArray | null;
+    while ((headerMatch = headerPattern.exec(text)) !== null) {
+      headers.push(headerMatch[0]);
+    }
+    return headers.map(h => h.replaceAll(/^#+\s+/, ''));
   }
 }
 
