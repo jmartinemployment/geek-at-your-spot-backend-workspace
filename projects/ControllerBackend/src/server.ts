@@ -9,6 +9,7 @@ import { toErrorMessage } from './utils/errors';
 dotenv.config();
 
 const app = express();
+app.disable('x-powered-by');
 const port = process.env.PORT || 4000;
 
 app.use(cors());
@@ -63,7 +64,7 @@ app.post('/api/email', async (req, res) => {
     }
 
     // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[^\s@]+@[^\s@.]+\.[^\s@]+$/;
     if (emailRegex.exec(email) === null) {
       return res.status(400).json({
         success: false,

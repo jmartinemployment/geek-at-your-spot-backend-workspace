@@ -81,7 +81,7 @@ export class TokenCounter {
       /\bdef\s+\w+\(/,
       /\bclass\s+\w+/,
       /\bimport\s+/,
-      /\bfrom\s+.*\bimport/,
+      /\bfrom\s+\S.*\bimport/,
     ];
 
     for (const pattern of codePatterns) {
@@ -188,12 +188,8 @@ export class TokenCounter {
     overlapTokens: number = 0
   ): string[] {
     const chunks: string[] = [];
-    const sentencePattern = /[^.!?]+[.!?]+/g;
-    const sentences: string[] = [];
-    let sentenceMatch: RegExpExecArray | null;
-    while ((sentenceMatch = sentencePattern.exec(text)) !== null) {
-      sentences.push(sentenceMatch[0]);
-    }
+    // Split on sentence boundaries (after .!?) without ReDoS-vulnerable regex
+    const sentences = text.split(/(?<=[.!?])\s+/).filter(s => s.length > 0);
     if (sentences.length === 0) {
       sentences.push(text);
     }

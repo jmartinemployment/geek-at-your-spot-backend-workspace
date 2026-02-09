@@ -18,13 +18,36 @@ function extractBulletPoints(text: string): string[] {
 }
 
 /**
+ * Shared helper: Extract a named section body from text without ReDoS-vulnerable regex.
+ * Finds the header matching `headerPattern`, then returns text up to the first
+ * occurrence of any string in `terminators` (or end of text).
+ */
+function extractSectionBody(text: string, headerPattern: RegExp, terminators: string[]): string | null {
+  const headerMatch = headerPattern.exec(text);
+  if (!headerMatch) return null;
+
+  const start = headerMatch.index + headerMatch[0].length;
+  const remaining = text.substring(start);
+
+  let end = remaining.length;
+  for (const term of terminators) {
+    const idx = remaining.indexOf(term);
+    if (idx !== -1 && idx < end) {
+      end = idx;
+    }
+  }
+
+  return remaining.substring(0, end);
+}
+
+/**
  * Shared helper: Extract recommendations section from text
  * Used by ResearcherAgent and AnalystAgent.
  */
 function extractRecommendationsFromText(text: string): string[] {
-  const recommendationSection = /recommendations?:?([\s\S]*?)(?=\n\n|\n#|$)/i.exec(text);
-  if (recommendationSection) {
-    return extractBulletPoints(recommendationSection[1]);
+  const sectionBody = extractSectionBody(text, /recommendations?:?/i, ['\n\n', '\n#']);
+  if (sectionBody) {
+    return extractBulletPoints(sectionBody);
   }
   return [];
 }
@@ -72,9 +95,10 @@ Format as JSON.
   private parseTaskBreakdown(content: string): any {
     try {
       // Try to extract JSON from response
-      const jsonMatch = /\{[\s\S]*\}/.exec(content);
-      if (jsonMatch) {
-        return JSON.parse(jsonMatch[0]);
+      const braceStart = content.indexOf('{');
+      const braceEnd = content.lastIndexOf('}');
+      if (braceStart !== -1 && braceEnd > braceStart) {
+        return JSON.parse(content.substring(braceStart, braceEnd + 1));
       }
     } catch {
       // Return raw content if parsing fails
@@ -278,7 +302,7 @@ Provide:
     const lines = text.split('\n');
 
     for (const line of lines) {
-      const match = /(\w+(?:\s+\w+)*?):\s*([0-9.]+%?)/.exec(line);
+      const match = /([^:]+):\s*(\d[\d.]*%?)/.exec(line);
       if (match) {
         metrics[match[1].toLowerCase().replaceAll(/\s+/g, '_')] = match[2];
       }
@@ -288,9 +312,9 @@ Provide:
   }
 
   private extractInsights(text: string): string[] {
-    const insightsSection = /insights?:?([\s\S]*?)(?=\n\n|\n#|recommendations|$)/i.exec(text);
-    if (insightsSection) {
-      return extractBulletPoints(insightsSection[1]);
+    const sectionBody = extractSectionBody(text, /insights?:?/i, ['\n\n', '\n#', 'recommendations']);
+    if (sectionBody) {
+      return extractBulletPoints(sectionBody);
     }
     return [];
   }
@@ -331,7 +355,7 @@ Provide well-structured, clear, and professional content.
   }
 
   private extractSections(text: string): string[] {
-    const headerPattern = /^#+\s+.+$/gm;
+    const headerPattern = /^#+\s+\S.*$/gm;
     const headers: string[] = [];
     let headerMatch: RegExpExecArray | null;
     while ((headerMatch = headerPattern.exec(text)) !== null) {
@@ -382,17 +406,17 @@ Provide:
   }
 
   private extractTestCases(text: string): string[] {
-    const testSection = /test cases?:?([\s\S]*?)(?=\n\n|\n#|quality|$)/i.exec(text);
-    if (testSection) {
-      return extractBulletPoints(testSection[1]);
+    const sectionBody = extractSectionBody(text, /test cases?:?/i, ['\n\n', '\n#', 'quality']);
+    if (sectionBody) {
+      return extractBulletPoints(sectionBody);
     }
     return [];
   }
 
   private extractIssues(text: string): string[] {
-    const issuesSection = /issues? found:?([\s\S]*?)(?=\n\n|\n#|recommendations|$)/i.exec(text);
-    if (issuesSection) {
-      return extractBulletPoints(issuesSection[1]);
+    const sectionBody = extractSectionBody(text, /issues? found:?/i, ['\n\n', '\n#', 'recommendations']);
+    if (sectionBody) {
+      return extractBulletPoints(sectionBody);
     }
     return [];
   }
@@ -446,17 +470,17 @@ Provide:
   }
 
   private extractMilestones(text: string): string[] {
-    const milestoneSection = /milestones?:?([\s\S]*?)(?=\n\n|\n#|resources|$)/i.exec(text);
-    if (milestoneSection) {
-      return extractBulletPoints(milestoneSection[1]);
+    const sectionBody = extractSectionBody(text, /milestones?:?/i, ['\n\n', '\n#', 'resources']);
+    if (sectionBody) {
+      return extractBulletPoints(sectionBody);
     }
     return [];
   }
 
   private extractRisks(text: string): string[] {
-    const riskSection = /risks?:?([\s\S]*?)(?=\n\n|\n#|success|$)/i.exec(text);
-    if (riskSection) {
-      return extractBulletPoints(riskSection[1]);
+    const sectionBody = extractSectionBody(text, /risks?:?/i, ['\n\n', '\n#', 'success']);
+    if (sectionBody) {
+      return extractBulletPoints(sectionBody);
     }
     return [];
   }
@@ -507,7 +531,7 @@ Provide:
     const lines = text.split('\n');
 
     for (const line of lines) {
-      const match = /(.+?):\s*\$?([\d,]+(?:\.\d{2})?)/.exec(line);
+      const match = /([^:]+):\s*\$?([\d,]+(?:\.\d{2})?)/.exec(line);
       if (match) {
         const key = match[1].trim().toLowerCase().replaceAll(/\s+/g, '_');
         const value = Number.parseFloat(match[2].replaceAll(',', ''));
@@ -519,7 +543,7 @@ Provide:
   }
 
   private extractTotalCost(text: string): number {
-    const match = /total.*?:\s*\$?([\d,]+(?:\.\d{2})?)/i.exec(text);
+    const match = /total[^:]*:\s*\$?([\d,]+(?:\.\d{2})?)/i.exec(text);
     if (match) {
       return Number.parseFloat(match[1].replaceAll(',', ''));
     }
@@ -527,9 +551,9 @@ Provide:
   }
 
   private extractAssumptions(text: string): string[] {
-    const assumptionSection = /assumptions?:?([\s\S]*?)(?=\n\n|\n#|risk|$)/i.exec(text);
-    if (assumptionSection) {
-      return extractBulletPoints(assumptionSection[1]);
+    const sectionBody = extractSectionBody(text, /assumptions?:?/i, ['\n\n', '\n#', 'risk']);
+    if (sectionBody) {
+      return extractBulletPoints(sectionBody);
     }
     return [];
   }
@@ -576,17 +600,17 @@ Provide:
   }
 
   private extractTechStack(text: string): string[] {
-    const techSection = /technology stack:?([\s\S]*?)(?=\n\n|\n#|system|$)/i.exec(text);
-    if (techSection) {
-      return extractBulletPoints(techSection[1]);
+    const sectionBody = extractSectionBody(text, /technology stack:?/i, ['\n\n', '\n#', 'system']);
+    if (sectionBody) {
+      return extractBulletPoints(sectionBody);
     }
     return [];
   }
 
   private extractComponents(text: string): string[] {
-    const componentSection = /components?:?([\s\S]*?)(?=\n\n|\n#|data|$)/i.exec(text);
-    if (componentSection) {
-      return extractBulletPoints(componentSection[1]);
+    const sectionBody = extractSectionBody(text, /components?:?/i, ['\n\n', '\n#', 'data']);
+    if (sectionBody) {
+      return extractBulletPoints(sectionBody);
     }
     return [];
   }

@@ -71,9 +71,10 @@ Format as JSON with keys: summary, insights (array), recommendations (array), me
 
   private parseTrafficResponse(text: string): TrafficAnalysisResult {
     try {
-      const jsonMatch = /\{[\s\S]*\}/.exec(text);
-      if (jsonMatch) {
-        return JSON.parse(jsonMatch[0]);
+      const braceStart = text.indexOf('{');
+      const braceEnd = text.lastIndexOf('}');
+      if (braceStart !== -1 && braceEnd > braceStart) {
+        return JSON.parse(text.substring(braceStart, braceEnd + 1));
       }
     } catch {
       // Expected: AI response may not contain valid JSON; fall back to raw text

@@ -54,7 +54,7 @@ function validateContactForm(req: Request, res: Response, next: Function) {
   }
 
   // Email validation
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const emailRegex = /^[^\s@]+@[^\s@.]+\.[^\s@]+$/;
   if (emailRegex.exec(email) === null) {
     return res.status(400).json({
       error: 'Invalid email address',

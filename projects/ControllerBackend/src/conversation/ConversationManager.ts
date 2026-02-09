@@ -407,8 +407,11 @@ Respond ONLY with JSON:
     try {
       const firstBlock = response.content[0];
       const text = firstBlock.type === 'text' ? firstBlock.text : '{}';
-      const jsonMatch = /\{[\s\S]*\}/.exec(text);
-      const parsed = jsonMatch ? JSON.parse(jsonMatch[0]) : {};
+      const braceStart = text.indexOf('{');
+      const braceEnd = text.lastIndexOf('}');
+      const parsed = (braceStart !== -1 && braceEnd > braceStart)
+        ? JSON.parse(text.substring(braceStart, braceEnd + 1))
+        : {};
       
       return {
         agreed: parsed.agreed || false,

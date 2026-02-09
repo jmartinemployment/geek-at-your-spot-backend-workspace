@@ -56,9 +56,10 @@ Format as JSON with keys: currentPerformance, optimizations (array), projectedIm
 
   private parseConversionResponse(text: string): ConversionResult {
     try {
-      const jsonMatch = /\{[\s\S]*\}/.exec(text);
-      if (jsonMatch) {
-        return JSON.parse(jsonMatch[0]);
+      const braceStart = text.indexOf('{');
+      const braceEnd = text.lastIndexOf('}');
+      if (braceStart !== -1 && braceEnd > braceStart) {
+        return JSON.parse(text.substring(braceStart, braceEnd + 1));
       }
     } catch {
       // Expected: AI response may not contain valid JSON; fall back to raw text

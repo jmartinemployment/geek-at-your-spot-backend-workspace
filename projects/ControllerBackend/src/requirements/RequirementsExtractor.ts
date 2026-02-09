@@ -78,12 +78,13 @@ Respond ONLY with valid JSON in this format:
     requiredFields: any[]
   ): ExtractedRequirements {
     try {
-      const jsonMatch = /\{[\s\S]*\}/.exec(text);
-      if (!jsonMatch) {
+      const braceStart = text.indexOf('{');
+      const braceEnd = text.lastIndexOf('}');
+      if (braceStart === -1 || braceEnd <= braceStart) {
         throw new Error('No JSON found in response');
       }
 
-      const parsed = JSON.parse(jsonMatch[0]);
+      const parsed = JSON.parse(text.substring(braceStart, braceEnd + 1));
       const extractedData = parsed.extracted || {};
 
       // Determine which required fields are missing

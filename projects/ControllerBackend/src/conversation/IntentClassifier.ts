@@ -63,9 +63,10 @@ Respond ONLY with JSON:
 
   private parseClassification(text: string): IntentClassification {
     try {
-      const jsonMatch = /\{[\s\S]*\}/.exec(text);
-      if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[0]);
+      const braceStart = text.indexOf('{');
+      const braceEnd = text.lastIndexOf('}');
+      if (braceStart !== -1 && braceEnd > braceStart) {
+        const parsed = JSON.parse(text.substring(braceStart, braceEnd + 1));
         return {
           primaryIntent: parsed.primaryIntent || 'general',
           confidence: parsed.confidence || 0,

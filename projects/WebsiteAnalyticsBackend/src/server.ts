@@ -9,6 +9,7 @@ import { toErrorMessage } from './utils/errors';
 dotenv.config();
 
 const app = express();
+app.disable('x-powered-by');
 const port = process.env.PORT || 5003;
 
 app.use(cors());

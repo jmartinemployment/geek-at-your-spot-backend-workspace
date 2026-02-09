@@ -80,12 +80,13 @@ Respond with ONLY valid JSON:
 
   private parseEstimate(text: string, requirements: Record<string, any>): EstimateResult {
     try {
-      const jsonMatch = /\{[\s\S]*\}/.exec(text);
-      if (!jsonMatch) {
+      const braceStart = text.indexOf('{');
+      const braceEnd = text.lastIndexOf('}');
+      if (braceStart === -1 || braceEnd <= braceStart) {
         throw new Error('No JSON found in response');
       }
 
-      const parsed = JSON.parse(jsonMatch[0]);
+      const parsed = JSON.parse(text.substring(braceStart, braceEnd + 1));
 
       const formatted = this.formatEstimateHTML(parsed, requirements);
 

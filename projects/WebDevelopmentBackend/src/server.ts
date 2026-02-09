@@ -18,6 +18,7 @@ dotenv.config();
 
 // Initialize Express
 const app = express();
+app.disable('x-powered-by');
 const port = process.env.PORT || 3000;
 
 // Initialize Prisma

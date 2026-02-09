@@ -1,5 +1,50 @@
 import Anthropic from '@anthropic-ai/sdk';
 
+/**
+ * Extract the outermost balanced JSON object from a string without regex backtracking.
+ * Scans for the first '{' then counts balanced braces to find the matching '}'.
+ * O(n) with no backtracking -- safe from ReDoS (SonarCloud S5852).
+ */
+export function extractBalancedJSON(text: string): string | null {
+  const start = text.indexOf('{');
+  if (start === -1) return null;
+
+  let depth = 0;
+  let inString = false;
+  let escape = false;
+
+  for (let i = start; i < text.length; i++) {
+    const ch = text[i];
+
+    if (escape) {
+      escape = false;
+      continue;
+    }
+
+    if (ch === '\\' && inString) {
+      escape = true;
+      continue;
+    }
+
+    if (ch === '"') {
+      inString = !inString;
+      continue;
+    }
+
+    if (inString) continue;
+
+    if (ch === '{') depth++;
+    else if (ch === '}') {
+      depth--;
+      if (depth === 0) {
+        return text.substring(start, i + 1);
+      }
+    }
+  }
+
+  return null;
+}
+
 export interface AnthropicConfig {
   apiKey: string;
   model?: string;
@@ -46,9 +91,9 @@ export class AnthropicHelper {
 
   parseJSON<T>(text: string): T | null {
     try {
-      const jsonMatch = /\{[\s\S]*\}/.exec(text);
-      if (jsonMatch) {
-        return JSON.parse(jsonMatch[0]);
+      const jsonStr = extractBalancedJSON(text);
+      if (jsonStr) {
+        return JSON.parse(jsonStr);
       }
     } catch {
       // Expected: AI response may not contain valid JSON
