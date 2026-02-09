@@ -155,10 +155,19 @@ app.get('/api/conversations', (req, res) => {
 
 // Proxy routes
 
+function buildProxyUrl(baseUrl: string, path: string): string {
+  const base = new URL(baseUrl);
+  const resolved = new URL(path, base);
+  if (resolved.origin !== base.origin) {
+    throw new Error('Invalid proxy path');
+  }
+  return resolved.href;
+}
+
 // Proxy to WebDevelopmentBackend
 app.use('/api/web-dev', async (req, res) => {
   try {
-    const url = `${WEB_DEV_BACKEND_URL}${req.path}`;
+    const url = buildProxyUrl(WEB_DEV_BACKEND_URL, req.path);
     const response = await fetch(url, {
       method: req.method,
       headers: { 'Content-Type': 'application/json' },
@@ -178,7 +187,7 @@ app.use('/api/ai-analytics', async (req, res) => {
     if (req.path !== '/health' && !req.path.startsWith('/api/')) {
       targetPath = `/api/analytics${req.path}`;
     }
-    const url = `${ANALYTICS_BACKEND_URL}${targetPath}`;
+    const url = buildProxyUrl(ANALYTICS_BACKEND_URL, targetPath);
     const response = await fetch(url, {
       method: req.method,
       headers: { 'Content-Type': 'application/json' },
@@ -198,7 +207,7 @@ app.use('/api/marketing', async (req, res) => {
     if (req.path !== '/health' && !req.path.startsWith('/api/')) {
       targetPath = `/api/marketing${req.path}`;
     }
-    const url = `${MARKETING_BACKEND_URL}${targetPath}`;
+    const url = buildProxyUrl(MARKETING_BACKEND_URL, targetPath);
     const response = await fetch(url, {
       method: req.method,
       headers: { 'Content-Type': 'application/json' },
@@ -218,7 +227,7 @@ app.use('/api/website-analytics', async (req, res) => {
     if (req.path !== '/health' && !req.path.startsWith('/api/')) {
       targetPath = `/api/analytics${req.path}`;
     }
-    const url = `${WEBSITE_ANALYTICS_BACKEND_URL}${targetPath}`;
+    const url = buildProxyUrl(WEBSITE_ANALYTICS_BACKEND_URL, targetPath);
     const response = await fetch(url, {
       method: req.method,
       headers: { 'Content-Type': 'application/json' },

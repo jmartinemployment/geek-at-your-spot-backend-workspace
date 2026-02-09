@@ -115,7 +115,7 @@ router.get(
   checkApiKey,
   async (req: Request, res: Response): Promise<void> => {
     try {
-      const conversationId = parseInt(req.params.id);
+      const conversationId = Number.parseInt(req.params.id, 10);
       const conversation = await conversationRepo.findById(conversationId);
 
       if (!conversation) {

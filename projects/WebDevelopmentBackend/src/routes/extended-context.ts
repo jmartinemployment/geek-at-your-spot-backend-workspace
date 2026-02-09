@@ -66,11 +66,11 @@ router.get('/messages/:conversationId', (req: Request, res: Response) => {
     const { startIndex, endIndex, limit, includeCompressed, minImportance } = req.query;
 
     const messages = extContextService.getMessages(conversationId, {
-      startIndex: startIndex ? parseInt(startIndex as string) : undefined,
-      endIndex: endIndex ? parseInt(endIndex as string) : undefined,
-      limit: limit ? parseInt(limit as string) : undefined,
+      startIndex: startIndex ? Number.parseInt(startIndex as string) : undefined,
+      endIndex: endIndex ? Number.parseInt(endIndex as string) : undefined,
+      limit: limit ? Number.parseInt(limit as string) : undefined,
       includeCompressed: includeCompressed === 'true',
-      minImportance: minImportance ? parseFloat(minImportance as string) : undefined,
+      minImportance: minImportance ? Number.parseFloat(minImportance as string) : undefined,
     });
 
     return res.status(200).json({

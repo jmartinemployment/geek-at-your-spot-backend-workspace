@@ -197,7 +197,7 @@ router.get('/conversations/recent', (req: Request, res: Response) => {
       });
     }
 
-    const limit = parseInt(req.query.limit as string) || 10;
+    const limit = Number.parseInt(req.query.limit as string, 10) || 10;
     const conversations = a2aService.getRecentConversations(limit);
 
     return res.status(200).json({

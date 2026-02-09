@@ -36,8 +36,8 @@ router.get('/leads', async (req: Request, res: Response): Promise<void> => {
       status: status as any,
       source: source as string,
       search: search as string,
-      skip: parseInt(skip as string),
-      take: parseInt(take as string)
+      skip: Number.parseInt(skip as string),
+      take: Number.parseInt(take as string)
     });
 
     res.json(result);
@@ -56,7 +56,7 @@ router.get('/leads', async (req: Request, res: Response): Promise<void> => {
  */
 router.get('/leads/:id', async (req: Request, res: Response): Promise<void> => {
   try {
-    const leadId = parseInt(req.params.id);
+    const leadId = Number.parseInt(req.params.id);
     const lead = await leadRepo.findById(leadId);
 
     if (!lead) {
@@ -83,7 +83,7 @@ router.get('/leads/:id', async (req: Request, res: Response): Promise<void> => {
  */
 router.patch('/leads/:id/status', async (req: Request, res: Response): Promise<void> => {
   try {
-    const leadId = parseInt(req.params.id);
+    const leadId = Number.parseInt(req.params.id);
     const { status } = req.body;
 
     if (!status) {
@@ -144,7 +144,7 @@ router.get('/stats', async (req: Request, res: Response): Promise<void> => {
  */
 router.get('/conversations/:leadId', async (req: Request, res: Response): Promise<void> => {
   try {
-    const leadId = parseInt(req.params.leadId);
+    const leadId = Number.parseInt(req.params.leadId);
     const conversations = await conversationRepo.findByLeadId(leadId);
 
     res.json(conversations);
@@ -163,7 +163,7 @@ router.get('/conversations/:leadId', async (req: Request, res: Response): Promis
  */
 router.delete('/leads/:id', async (req: Request, res: Response): Promise<void> => {
   try {
-    const leadId = parseInt(req.params.id);
+    const leadId = Number.parseInt(req.params.id);
     const lead = await leadRepo.softDelete(leadId);
 
     res.json({

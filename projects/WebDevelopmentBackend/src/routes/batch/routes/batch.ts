@@ -212,8 +212,8 @@ router.get('/jobs', (req: Request, res: Response) => {
       type: type as any,
       priority: priority as any,
       userId: userId as string,
-      limit: limit ? parseInt(limit as string) : undefined,
-      offset: offset ? parseInt(offset as string) : undefined,
+      limit: limit ? Number.parseInt(limit as string) : undefined,
+      offset: offset ? Number.parseInt(offset as string) : undefined,
     });
 
     res.status(200).json({

@@ -1,6 +1,3 @@
-
-Copy
-
 // ============================================
 // src/routes/code-execution.ts
 // Code Execution API Routes

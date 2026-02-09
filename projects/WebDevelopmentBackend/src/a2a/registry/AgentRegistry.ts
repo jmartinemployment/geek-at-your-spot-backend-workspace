@@ -143,7 +143,7 @@ export class AgentRegistry {
           // Return agent with lowest current load
           return matchingAgents.reduce((best, current) =>
             current.getCurrentLoad() < best.getCurrentLoad() ? current : best
-          );
+          , matchingAgents[0]);
         }
       }
     }
@@ -158,14 +158,14 @@ export class AgentRegistry {
       if (capableAgents.length > 0) {
         return capableAgents.reduce((best, current) =>
           current.getCurrentLoad() < best.getCurrentLoad() ? current : best
-        );
+        , capableAgents[0]);
       }
     }
 
     // Default: return least loaded available agent
     return availableAgents.reduce((best, current) =>
       current.getCurrentLoad() < best.getCurrentLoad() ? current : best
-    );
+    , availableAgents[0]);
   }
 
   /**
@@ -415,7 +415,7 @@ export class AgentRegistry {
 
     return availableAgents.reduce((best, current) =>
       current.getCurrentLoad() < best.getCurrentLoad() ? current : best
-    );
+    , availableAgents[0]);
   }
 
   /**
@@ -441,7 +441,7 @@ export class AgentRegistry {
       const currentScore = currentMetrics.successRate * (1 + Math.log10(currentMetrics.totalTasks + 1));
 
       return currentScore > bestScore ? current : best;
-    });
+    }, agents[0]);
   }
 
   /**

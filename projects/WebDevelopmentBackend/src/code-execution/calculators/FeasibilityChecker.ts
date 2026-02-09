@@ -178,7 +178,7 @@ export class FeasibilityChecker {
     let complexFeatures = 0;
 
     for (const feature of features) {
-      const featureLower = feature.toLowerCase().replace(/ /g, '_');
+      const featureLower = feature.toLowerCase().replaceAll(' ', '_');
       const complexity = this.featureComplexity[featureLower] || 5;
 
       totalComplexity += complexity;
@@ -481,7 +481,7 @@ export class FeasibilityChecker {
     let totalHours = 0;
 
     for (const feature of input.features) {
-      const featureLower = feature.toLowerCase().replace(/ /g, '_');
+      const featureLower = feature.toLowerCase().replaceAll(' ', '_');
       const complexity = this.featureComplexity[featureLower] || 5;
       const hours = complexity * 10; // Rough estimate
       totalHours += hours;

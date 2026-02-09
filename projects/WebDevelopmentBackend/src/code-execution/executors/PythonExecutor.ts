@@ -214,7 +214,7 @@ def _restricted_import(name, *args, **kwargs):
 __builtins__.__import__ = _restricted_import
 
 # Setup input
-__input__ = json.loads('${inputJson.replace(/'/g, "\\'")}')
+__input__ = json.loads('${inputJson.replaceAll("'", "\\'")}')
 
 # Capture logs
 _logs = []

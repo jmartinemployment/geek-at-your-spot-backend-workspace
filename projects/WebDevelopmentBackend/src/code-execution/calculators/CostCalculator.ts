@@ -215,7 +215,7 @@ export class CostCalculator {
       const estimatedHours = this.estimateUnknownFeature(feature);
       breakdown.push({
         category: 'Custom Feature',
-        description: feature.replace(/_/g, ' '),
+        description: feature.replaceAll('_', ' '),
         hours: estimatedHours,
         rate: hourlyRate,
         subtotal: Math.round(estimatedHours * hourlyRate * complexityMult * projectMult),
@@ -243,7 +243,7 @@ export class CostCalculator {
 
     breakdown.push({
       category: this.categorizeFeature(feature),
-      description: feature.replace(/_/g, ' '),
+      description: feature.replaceAll('_', ' '),
       hours,
       rate: hourlyRate,
       subtotal,

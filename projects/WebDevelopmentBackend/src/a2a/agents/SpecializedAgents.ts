@@ -272,7 +272,7 @@ Provide:
     for (const line of lines) {
       const match = line.match(/(\w+(?:\s+\w+)*?):\s*([0-9.]+%?)/);
       if (match) {
-        metrics[match[1].toLowerCase().replace(/\s+/g, '_')] = match[2];
+        metrics[match[1].toLowerCase().replaceAll(/\s+/g, '_')] = match[2];
       }
     }
 
@@ -525,8 +525,8 @@ Provide:
     for (const line of lines) {
       const match = line.match(/(.+?):\s*\$?([\d,]+(?:\.\d{2})?)/);
       if (match) {
-        const key = match[1].trim().toLowerCase().replace(/\s+/g, '_');
-        const value = parseFloat(match[2].replace(/,/g, ''));
+        const key = match[1].trim().toLowerCase().replaceAll(/\s+/g, '_');
+        const value = Number.parseFloat(match[2].replaceAll(',', ''));
         breakdown[key] = value;
       }
     }
@@ -537,7 +537,7 @@ Provide:
   private extractTotalCost(text: string): number {
     const match = text.match(/total.*?:\s*\$?([\d,]+(?:\.\d{2})?)/i);
     if (match) {
-      return parseFloat(match[1].replace(/,/g, ''));
+      return Number.parseFloat(match[1].replaceAll(',', ''));
     }
     return 0;
   }
