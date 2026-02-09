@@ -13,13 +13,13 @@ import {
 export class CostCalculator {
   private baseHourlyRate: number = 150;
 
-  private complexityMultipliers = {
+  private readonly complexityMultipliers = {
     low: 0.8,
     medium: 1.0,
     high: 1.3,
   };
 
-  private projectTypeMultipliers = {
+  private readonly projectTypeMultipliers = {
     website: 1.0,
     mobile_app: 1.2,
     ecommerce: 1.3,

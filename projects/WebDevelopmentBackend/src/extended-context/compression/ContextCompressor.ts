@@ -17,8 +17,8 @@ import {
 } from '../types';
 
 export class ContextCompressor {
-  private client: Anthropic;
-  private model: string;
+  private readonly client: Anthropic;
+  private readonly model: string;
 
   constructor(anthropicApiKey: string, model?: string) {
     this.client = new Anthropic({ apiKey: anthropicApiKey });
@@ -460,7 +460,7 @@ Provide a summary in 2-3 paragraphs.`;
 
     for (const line of lines) {
       const trimmed = line.trim();
-      if (trimmed.match(/^[-•*]\s+/) || trimmed.match(/^\d+\.\s+/)) {
+      if ((/^[-•*]\s+/.exec(trimmed)) || (/^\d+\.\s+/.exec(trimmed))) {
         keyPoints.push(trimmed.replace(/^[-•*]\s+/, '').replace(/^\d+\.\s+/, ''));
       }
     }

@@ -7,8 +7,8 @@ import Anthropic from '@anthropic-ai/sdk';
 import { ChatMessage, QuoteEstimate } from '../types';
 
 export class ClaudeService {
-  private client: Anthropic;
-  private model: string = 'claude-sonnet-4-20250514';
+  private readonly client: Anthropic;
+  private readonly model: string = 'claude-sonnet-4-20250514';
 
   constructor(apiKey: string) {
     this.client = new Anthropic({

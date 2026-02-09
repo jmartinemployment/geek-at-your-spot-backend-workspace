@@ -19,10 +19,10 @@ import {
 } from '../types';
 
 export class ContextWindowManager {
-  private windows: Map<string, ContextWindow> = new Map();
-  private snapshots: Map<string, ContextSnapshot[]> = new Map();
-  private events: Map<string, ContextEvent[]> = new Map();
-  private compressor: ContextCompressor;
+  private readonly windows: Map<string, ContextWindow> = new Map();
+  private readonly snapshots: Map<string, ContextSnapshot[]> = new Map();
+  private readonly events: Map<string, ContextEvent[]> = new Map();
+  private readonly compressor: ContextCompressor;
   private config: ContextWindowConfig;
 
   constructor(

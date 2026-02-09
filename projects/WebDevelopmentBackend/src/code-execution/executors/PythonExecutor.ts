@@ -23,7 +23,7 @@ export class PythonExecutor {
     allowProcessSpawn: false,
   };
 
-  private pythonPath: string;
+  private readonly pythonPath: string;
 
   constructor(
     pythonPath?: string,

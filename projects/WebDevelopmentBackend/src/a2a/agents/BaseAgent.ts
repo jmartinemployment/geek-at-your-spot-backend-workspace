@@ -223,7 +223,7 @@ export abstract class BaseAgent {
 
     // Try to extract structured information
     // Look for delegation indicators
-    const delegationMatch = responseText.match(/DELEGATE TO: (\w+)\s*-\s*(.+)/i);
+    const delegationMatch = /DELEGATE TO: (\w+)\s*-\s*(.+)/i.exec(responseText);
     if (delegationMatch) {
       response.delegateTo = {
         agentId: delegationMatch[1],
@@ -233,7 +233,7 @@ export abstract class BaseAgent {
     }
 
     // Look for next actions
-    const actionsMatch = responseText.match(/NEXT ACTIONS?:([\s\S]+?)(?=\n\n|\n[A-Z]+:|$)/i);
+    const actionsMatch = /NEXT ACTIONS?:([\s\S]+?)(?=\n\n|\n[A-Z]+:|$)/i.exec(responseText);
     if (actionsMatch) {
       response.nextActions = actionsMatch[1]
         .split('\n')
@@ -243,7 +243,7 @@ export abstract class BaseAgent {
     }
 
     // Look for information requests
-    const infoMatch = responseText.match(/NEED INFO FROM: (\w+)\s*-\s*(.+)/i);
+    const infoMatch = /NEED INFO FROM: (\w+)\s*-\s*(.+)/i.exec(responseText);
     if (infoMatch) {
       response.requestsInfo = [{
         from: infoMatch[1],

@@ -37,9 +37,9 @@ export interface ChatResponse {
 }
 
 export class MCPClient {
-  private client: Anthropic;
-  private registry: MCPRegistry;
-  private config: MCPClientConfig;
+  private readonly client: Anthropic;
+  private readonly registry: MCPRegistry;
+  private readonly config: MCPClientConfig;
 
   constructor(registry: MCPRegistry, config: MCPClientConfig) {
     this.registry = registry;
@@ -57,7 +57,7 @@ export class MCPClient {
     options: ChatOptions = {}
   ): Promise<ChatResponse> {
     const toolsUsed: string[] = [];
-    let currentMessages = [...messages];
+    const currentMessages = [...messages];
     const maxToolUses = options.maxToolUses || 10;
     let toolUseCount = 0;
 

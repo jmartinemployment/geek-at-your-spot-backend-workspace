@@ -23,11 +23,11 @@ import {
 } from './types';
 
 export class CodeExecutionService {
-  private jsExecutor: JavaScriptExecutor;
-  private pythonExecutor: PythonExecutor;
-  private costCalculator: CostCalculator;
-  private timelineGenerator: TimelineGenerator;
-  private feasibilityChecker: FeasibilityChecker;
+  private readonly jsExecutor: JavaScriptExecutor;
+  private readonly pythonExecutor: PythonExecutor;
+  private readonly costCalculator: CostCalculator;
+  private readonly timelineGenerator: TimelineGenerator;
+  private readonly feasibilityChecker: FeasibilityChecker;
   private config: CodeExecutionConfig;
 
   // Execution statistics

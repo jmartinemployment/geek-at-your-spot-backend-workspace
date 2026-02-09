@@ -26,9 +26,9 @@ import {
 } from '../types';
 
 export class AgentRegistry {
-  private agents: Map<string, BaseAgent> = new Map();
+  private readonly agents: Map<string, BaseAgent> = new Map();
   private routingRules: TaskRoutingRule[] = [];
-  private anthropicApiKey: string;
+  private readonly anthropicApiKey: string;
 
   constructor(anthropicApiKey: string) {
     this.anthropicApiKey = anthropicApiKey;

@@ -157,7 +157,7 @@ export class TimelineGenerator {
 
     // Find critical path (longest path)
     const criticalNodes: DependencyNode[] = [];
-    let currentNode = graph.reduce((longest, node) => {
+    const currentNode = graph.reduce((longest, node) => {
       const nodeEnd = (earliestStart.get(node.id) || 0) + node.duration;
       const longestEnd = (earliestStart.get(longest.id) || 0) + longest.duration;
       return nodeEnd > longestEnd ? node : longest;
@@ -430,7 +430,7 @@ export class TimelineGenerator {
     const totalWorkingDays = timeline.totalWeeks * workDaysPerWeek;
 
     // Add working days to start date (skipping weekends)
-    let currentDate = new Date(startDate);
+    const currentDate = new Date(startDate);
     let daysAdded = 0;
 
     while (daysAdded < totalWorkingDays) {

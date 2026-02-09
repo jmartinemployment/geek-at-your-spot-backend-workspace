@@ -25,11 +25,11 @@ export interface ChatResponse {
 }
 
 export class ConversationManager {
-  private store: ConversationStore;
-  private classifier: IntentClassifier;
-  private extractor: RequirementsExtractor;
-  private estimator: EstimateGenerator;
-  private anthropic: Anthropic;
+  private readonly store: ConversationStore;
+  private readonly classifier: IntentClassifier;
+  private readonly extractor: RequirementsExtractor;
+  private readonly estimator: EstimateGenerator;
+  private readonly anthropic: Anthropic;
 
   constructor(anthropicApiKey: string) {
     this.store = new ConversationStore();
@@ -406,7 +406,7 @@ Respond ONLY with JSON:
     try {
       const firstBlock = response.content[0];
       const text = firstBlock.type === 'text' ? firstBlock.text : '{}';
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      const jsonMatch = /\{[\s\S]*\}/.exec(text);
       const parsed = jsonMatch ? JSON.parse(jsonMatch[0]) : {};
       
       return {

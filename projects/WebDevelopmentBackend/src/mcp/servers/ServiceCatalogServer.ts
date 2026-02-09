@@ -23,7 +23,7 @@ export class ServiceCatalogServer implements MCPServer {
   tools: MCPTool[] = [];
   handlers: Map<string, MCPToolHandler> = new Map();
 
-  private serviceCatalog: ServiceCatalogItem[] = [
+  private readonly serviceCatalog: ServiceCatalogItem[] = [
     {
       id: 'web-basic',
       name: 'Basic Website',

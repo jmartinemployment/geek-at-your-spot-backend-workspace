@@ -5,7 +5,7 @@
 import { PrismaClient, Lead, LeadStatus, Prisma } from '@prisma/client';
 
 export class LeadRepository {
-  private prisma: PrismaClient;
+  private readonly prisma: PrismaClient;
 
   constructor(prisma: PrismaClient) {
     this.prisma = prisma;

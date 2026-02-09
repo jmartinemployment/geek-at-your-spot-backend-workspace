@@ -21,7 +21,7 @@ export class JavaScriptExecutor {
     allowProcessSpawn: false,
   };
 
-  constructor(private config?: Partial<SandboxConfig>) {
+  constructor(private readonly config?: Partial<SandboxConfig>) {
     this.defaultConfig = { ...this.defaultConfig, ...config };
   }
 

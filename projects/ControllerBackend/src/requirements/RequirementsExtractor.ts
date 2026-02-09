@@ -10,7 +10,7 @@ export interface ExtractedRequirements {
 }
 
 export class RequirementsExtractor {
-  private anthropic: Anthropic;
+  private readonly anthropic: Anthropic;
 
   constructor(apiKey: string) {
     this.anthropic = new Anthropic({ apiKey });
@@ -77,7 +77,7 @@ Respond ONLY with valid JSON in this format:
     requiredFields: any[]
   ): ExtractedRequirements {
     try {
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      const jsonMatch = /\{[\s\S]*\}/.exec(text);
       if (!jsonMatch) {
         throw new Error('No JSON found in response');
       }

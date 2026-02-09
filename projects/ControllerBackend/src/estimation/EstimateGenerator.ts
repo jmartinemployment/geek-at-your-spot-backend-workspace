@@ -14,7 +14,7 @@ export interface EstimateResult {
 }
 
 export class EstimateGenerator {
-  private anthropic: Anthropic;
+  private readonly anthropic: Anthropic;
 
   constructor(apiKey: string) {
     this.anthropic = new Anthropic({ apiKey });
@@ -79,7 +79,7 @@ Respond with ONLY valid JSON:
 
   private parseEstimate(text: string, requirements: Record<string, any>): EstimateResult {
     try {
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      const jsonMatch = /\{[\s\S]*\}/.exec(text);
       if (!jsonMatch) {
         throw new Error('No JSON found in response');
       }

@@ -17,7 +17,7 @@ router.get('/health', async (req: Request, res: Response) => {
   try {
     const registry = req.app.locals.mcpRegistry as MCPRegistry;
 
-    if (!registry || !registry.isEnabled()) {
+    if (!registry?.isEnabled()) {
       return res.status(200).json({
         status: 'disabled',
         message: 'MCP is not enabled',
@@ -48,7 +48,7 @@ router.get('/tools', (req: Request, res: Response) => {
   try {
     const registry = req.app.locals.mcpRegistry as MCPRegistry;
 
-    if (!registry || !registry.isEnabled()) {
+    if (!registry?.isEnabled()) {
       return res.status(200).json({
         enabled: false,
         tools: [],
@@ -83,7 +83,7 @@ router.get('/stats', (req: Request, res: Response) => {
   try {
     const registry = req.app.locals.mcpRegistry as MCPRegistry;
 
-    if (!registry || !registry.isEnabled()) {
+    if (!registry?.isEnabled()) {
       return res.status(200).json({
         enabled: false,
         stats: null,
@@ -112,7 +112,7 @@ router.post('/execute', async (req: Request, res: Response) => {
   try {
     const registry = req.app.locals.mcpRegistry as MCPRegistry;
 
-    if (!registry || !registry.isEnabled()) {
+    if (!registry?.isEnabled()) {
       return res.status(400).json({
         error: 'MCP is not enabled',
       });
@@ -188,7 +188,7 @@ router.get('/servers', (req: Request, res: Response) => {
   try {
     const registry = req.app.locals.mcpRegistry as MCPRegistry;
 
-    if (!registry || !registry.isEnabled()) {
+    if (!registry?.isEnabled()) {
       return res.status(200).json({
         enabled: false,
         servers: [],
@@ -223,7 +223,7 @@ router.get('/tool/:toolName', (req: Request, res: Response) => {
   try {
     const registry = req.app.locals.mcpRegistry as MCPRegistry;
 
-    if (!registry || !registry.isEnabled()) {
+    if (!registry?.isEnabled()) {
       return res.status(400).json({
         error: 'MCP is not enabled',
       });
@@ -266,7 +266,7 @@ router.post('/stats/reset', (req: Request, res: Response) => {
   try {
     const registry = req.app.locals.mcpRegistry as MCPRegistry;
 
-    if (!registry || !registry.isEnabled()) {
+    if (!registry?.isEnabled()) {
       return res.status(400).json({
         error: 'MCP is not enabled',
       });

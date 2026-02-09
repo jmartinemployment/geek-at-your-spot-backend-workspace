@@ -18,7 +18,7 @@ export interface ContentResult {
 }
 
 export class ContentService {
-  private anthropic: Anthropic;
+  private readonly anthropic: Anthropic;
 
   constructor(apiKey: string) {
     this.anthropic = new Anthropic({ apiKey });

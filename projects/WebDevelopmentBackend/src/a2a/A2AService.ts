@@ -21,9 +21,9 @@ import {
 
 export class A2AService {
   private config: A2AConfig;
-  private agentRegistry: AgentRegistry;
-  private conversationManager: ConversationManager;
-  private orchestrator: Orchestrator;
+  private readonly agentRegistry: AgentRegistry;
+  private readonly conversationManager: ConversationManager;
+  private readonly orchestrator: Orchestrator;
   private initialized: boolean = false;
 
   constructor(config: Partial<A2AConfig>) {

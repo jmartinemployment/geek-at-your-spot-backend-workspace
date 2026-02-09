@@ -19,10 +19,10 @@ import { ServiceCatalogServer } from '../servers/ServiceCatalogServer';
 import { PricingServer } from '../servers/PricingServer';
 
 export class MCPRegistry {
-  private servers: Map<string, MCPServer> = new Map();
-  private tools: Map<string, { server: MCPServer; handler: MCPToolHandler }> = new Map();
-  private context: MCPExecutionContext;
-  private config: MCPRegistryConfig;
+  private readonly servers: Map<string, MCPServer> = new Map();
+  private readonly tools: Map<string, { server: MCPServer; handler: MCPToolHandler }> = new Map();
+  private readonly context: MCPExecutionContext;
+  private readonly config: MCPRegistryConfig;
 
   private stats = {
     totalExecutions: 0,

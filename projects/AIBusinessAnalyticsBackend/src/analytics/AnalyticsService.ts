@@ -15,7 +15,7 @@ export interface AnalyticsResult {
 }
 
 export class AnalyticsService {
-  private anthropic: AnthropicHelper;
+  private readonly anthropic: AnthropicHelper;
 
   constructor(apiKey: string) {
     this.anthropic = new AnthropicHelper({ apiKey });

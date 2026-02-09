@@ -1,7 +1,7 @@
 import { ConversationContext, Message, ConversationPhase } from '../types/conversation';
 
 export class ConversationStore {
-  private conversations: Map<string, ConversationContext> = new Map();
+  private readonly conversations: Map<string, ConversationContext> = new Map();
 
   create(conversationId: string): ConversationContext {
     const context: ConversationContext = {

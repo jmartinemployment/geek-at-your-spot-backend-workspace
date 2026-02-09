@@ -12,7 +12,7 @@ import {
 
 export class FeasibilityChecker {
   // Technology compatibility matrix
-  private technologyCompatibility: Record<string, string[]> = {
+  private readonly technologyCompatibility: Record<string, string[]> = {
     react: ['node', 'express', 'nextjs', 'typescript', 'tailwind'],
     angular: ['node', 'express', 'typescript', 'rxjs'],
     vue: ['node', 'express', 'nuxtjs', 'typescript'],
@@ -29,7 +29,7 @@ export class FeasibilityChecker {
   };
 
   // Complexity scores for features
-  private featureComplexity: Record<string, number> = {
+  private readonly featureComplexity: Record<string, number> = {
     user_registration: 3,
     social_login: 5,
     two_factor_auth: 7,
@@ -45,7 +45,7 @@ export class FeasibilityChecker {
   };
 
   // Team experience multipliers
-  private experienceMultipliers = {
+  private readonly experienceMultipliers = {
     junior: 1.5,
     mid: 1.0,
     senior: 0.8,

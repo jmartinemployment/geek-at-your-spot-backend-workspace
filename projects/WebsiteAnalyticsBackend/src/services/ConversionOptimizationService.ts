@@ -16,7 +16,7 @@ export interface ConversionResult {
 }
 
 export class ConversionOptimizationService {
-  private anthropic: Anthropic;
+  private readonly anthropic: Anthropic;
 
   constructor(apiKey: string) {
     this.anthropic = new Anthropic({ apiKey });

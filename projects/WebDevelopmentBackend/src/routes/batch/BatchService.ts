@@ -28,10 +28,10 @@ import {
 
 export class BatchService {
   private config: BatchConfig;
-  private queue: JobQueue;
-  private processor: JobProcessor;
+  private readonly queue: JobQueue;
+  private readonly processor: JobProcessor;
   private initialized: boolean = false;
-  private batches: Map<string, BatchJob> = new Map();
+  private readonly batches: Map<string, BatchJob> = new Map();
 
   constructor(config: Partial<BatchConfig>) {
     this.config = {

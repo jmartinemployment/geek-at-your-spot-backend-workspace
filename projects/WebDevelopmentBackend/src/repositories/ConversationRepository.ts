@@ -6,7 +6,7 @@ import { PrismaClient, Conversation } from '@prisma/client';
 import { ChatMessage } from '../types';
 
 export class ConversationRepository {
-  private prisma: PrismaClient;
+  private readonly prisma: PrismaClient;
 
   constructor(prisma: PrismaClient) {
     this.prisma = prisma;

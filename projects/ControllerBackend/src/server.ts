@@ -156,12 +156,9 @@ app.get('/api/conversations', (req, res) => {
 // Proxy routes
 
 function buildProxyUrl(baseUrl: string, path: string): string {
-  const base = new URL(baseUrl);
-  const resolved = new URL(path, base);
-  if (resolved.origin !== base.origin) {
-    throw new Error('Invalid proxy path');
-  }
-  return resolved.href;
+  const url = new URL(baseUrl);
+  url.pathname = path;
+  return url.href;
 }
 
 // Proxy to WebDevelopmentBackend
@@ -176,6 +173,7 @@ app.use('/api/web-dev', async (req, res) => {
     const data = await response.json();
     res.status(response.status).json(data);
   } catch (error) {
+    console.error('Proxy error (web-dev):', error);
     res.status(500).json({ error: 'Failed to proxy request' });
   }
 });
@@ -196,6 +194,7 @@ app.use('/api/ai-analytics', async (req, res) => {
     const data = await response.json();
     res.status(response.status).json(data);
   } catch (error) {
+    console.error('Proxy error (ai-analytics):', error);
     res.status(500).json({ error: 'Failed to proxy analytics request' });
   }
 });
@@ -216,6 +215,7 @@ app.use('/api/marketing', async (req, res) => {
     const data = await response.json();
     res.status(response.status).json(data);
   } catch (error) {
+    console.error('Proxy error (marketing):', error);
     res.status(500).json({ error: 'Failed to proxy marketing request' });
   }
 });
@@ -236,6 +236,7 @@ app.use('/api/website-analytics', async (req, res) => {
     const data = await response.json();
     res.status(response.status).json(data);
   } catch (error) {
+    console.error('Proxy error (website-analytics):', error);
     res.status(500).json({ error: 'Failed to proxy website analytics request' });
   }
 });

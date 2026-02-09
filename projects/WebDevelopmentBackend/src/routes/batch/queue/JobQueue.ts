@@ -20,12 +20,12 @@ import {
 
 export class JobQueue {
   private config: QueueConfig;
-  private jobs: Map<string, Job> = new Map();
-  private queues: Map<JobPriority, Job[]> = new Map();
-  private processingJobs: Set<string> = new Set();
+  private readonly jobs: Map<string, Job> = new Map();
+  private readonly queues: Map<JobPriority, Job[]> = new Map();
+  private readonly processingJobs: Set<string> = new Set();
 
   // Statistics
-  private stats = {
+  private readonly stats = {
     totalCreated: 0,
     totalCompleted: 0,
     totalFailed: 0,
@@ -142,7 +142,7 @@ export class JobQueue {
     for (const depId of job.dependencies) {
       const depJob = this.jobs.get(depId);
 
-      if (!depJob || depJob.status !== 'completed') {
+      if (depJob?.status !== 'completed') {
         return false;
       }
     }

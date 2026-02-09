@@ -18,7 +18,7 @@ export interface SEOResult {
 }
 
 export class SEOService {
-  private anthropic: Anthropic;
+  private readonly anthropic: Anthropic;
 
   constructor(apiKey: string) {
     this.anthropic = new Anthropic({ apiKey });
@@ -61,7 +61,7 @@ Format as JSON with keys: score, analysis, recommendations (array), keywords (ob
 
   private parseSEOResponse(text: string): SEOResult {
     try {
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      const jsonMatch = /\{[\s\S]*\}/.exec(text);
       if (jsonMatch) {
         return JSON.parse(jsonMatch[0]);
       }

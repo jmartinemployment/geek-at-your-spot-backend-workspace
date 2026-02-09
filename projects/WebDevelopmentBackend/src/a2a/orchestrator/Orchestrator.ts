@@ -19,8 +19,8 @@ import {
 } from '../types';
 
 export class Orchestrator {
-  private agentRegistry: AgentRegistry;
-  private conversationManager: ConversationManager;
+  private readonly agentRegistry: AgentRegistry;
+  private readonly conversationManager: ConversationManager;
   private strategy: OrchestrationStrategy;
 
   constructor(
@@ -508,7 +508,7 @@ export class Orchestrator {
     const lines = response.content.split('\n');
     for (const line of lines) {
       const trimmed = line.trim();
-      if (trimmed.match(/^[-•*]\s+/) || trimmed.match(/^\d+\.\s+/)) {
+      if ((/^[-•*]\s+/.exec(trimmed)) || (/^\d+\.\s+/.exec(trimmed))) {
         const task = trimmed.replace(/^[-•*]\s+/, '').replace(/^\d+\.\s+/, '');
         if (task.length > 10) {
           // Minimum task length

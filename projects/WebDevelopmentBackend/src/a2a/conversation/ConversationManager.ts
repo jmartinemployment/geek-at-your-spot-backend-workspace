@@ -17,8 +17,8 @@ import {
 } from '../types';
 
 export class ConversationManager {
-  private conversations: Map<string, ConversationContext> = new Map();
-  private events: Map<string, ConversationEvent[]> = new Map();
+  private readonly conversations: Map<string, ConversationContext> = new Map();
+  private readonly events: Map<string, ConversationEvent[]> = new Map();
 
   /**
    * Create a new conversation

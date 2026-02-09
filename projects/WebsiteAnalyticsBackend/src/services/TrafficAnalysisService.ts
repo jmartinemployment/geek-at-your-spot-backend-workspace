@@ -20,7 +20,7 @@ export interface TrafficAnalysisResult {
 }
 
 export class TrafficAnalysisService {
-  private anthropic: Anthropic;
+  private readonly anthropic: Anthropic;
 
   constructor(apiKey: string) {
     this.anthropic = new Anthropic({ apiKey });

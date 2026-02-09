@@ -23,12 +23,12 @@ import {
 
 export class ExtendedContextService {
   private config: ExtendedContextConfig;
-  private windowManager: ContextWindowManager;
-  private compressor: ContextCompressor;
+  private readonly windowManager: ContextWindowManager;
+  private readonly compressor: ContextCompressor;
   private initialized: boolean = false;
 
   // Statistics
-  private stats = {
+  private readonly stats = {
     totalConversations: 0,
     totalMessages: 0,
     totalCompressions: 0,

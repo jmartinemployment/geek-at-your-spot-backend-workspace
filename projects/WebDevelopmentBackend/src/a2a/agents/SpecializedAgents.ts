@@ -49,7 +49,7 @@ Format as JSON.
   private parseTaskBreakdown(content: string): any {
     try {
       // Try to extract JSON from response
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      const jsonMatch = /\{[\s\S]*\}/.exec(content);
       if (jsonMatch) {
         return JSON.parse(jsonMatch[0]);
       }
@@ -102,12 +102,12 @@ Provide:
   private extractKeyPoints(text: string): string[] {
     const lines = text.split('\n');
     return lines
-      .filter(line => line.trim().match(/^[-•*]\s+/))
-      .map(line => line.trim().replace(/^[-•*]\s+/, ''));
+      .filter(line => /^[-•*]\s+/.exec(line.trim()))
+      .map(line => line.trim().replaceAll(/^[-•*]\s+/, ''));
   }
 
   private extractRecommendations(text: string): string[] {
-    const recommendationSection = text.match(/recommendations?:?([\s\S]*?)(?=\n\n|\n#|$)/i);
+    const recommendationSection = /recommendations?:?([\s\S]*?)(?=\n\n|\n#|$)/i.exec(text);
     if (recommendationSection) {
       return this.extractKeyPoints(recommendationSection[1]);
     }
@@ -270,7 +270,7 @@ Provide:
     const lines = text.split('\n');
 
     for (const line of lines) {
-      const match = line.match(/(\w+(?:\s+\w+)*?):\s*([0-9.]+%?)/);
+      const match = /(\w+(?:\s+\w+)*?):\s*([0-9.]+%?)/.exec(line);
       if (match) {
         metrics[match[1].toLowerCase().replaceAll(/\s+/g, '_')] = match[2];
       }
@@ -280,7 +280,7 @@ Provide:
   }
 
   private extractInsights(text: string): string[] {
-    const insightsSection = text.match(/insights?:?([\s\S]*?)(?=\n\n|\n#|recommendations|$)/i);
+    const insightsSection = /insights?:?([\s\S]*?)(?=\n\n|\n#|recommendations|$)/i.exec(text);
     if (insightsSection) {
       return this.extractKeyPoints(insightsSection[1]);
     }
@@ -290,12 +290,12 @@ Provide:
   private extractKeyPoints(text: string): string[] {
     const lines = text.split('\n');
     return lines
-      .filter(line => line.trim().match(/^[-•*]\s+/))
-      .map(line => line.trim().replace(/^[-•*]\s+/, ''));
+      .filter(line => /^[-•*]\s+/.exec(line.trim()))
+      .map(line => line.trim().replaceAll(/^[-•*]\s+/, ''));
   }
 
   private extractRecommendations(text: string): string[] {
-    const recommendationSection = text.match(/recommendations?:?([\s\S]*?)(?=\n\n|\n#|$)/i);
+    const recommendationSection = /recommendations?:?([\s\S]*?)(?=\n\n|\n#|$)/i.exec(text);
     if (recommendationSection) {
       return this.extractKeyPoints(recommendationSection[1]);
     }
@@ -339,7 +339,7 @@ Provide well-structured, clear, and professional content.
 
   private extractSections(text: string): string[] {
     const headers = text.match(/^#+\s+.+$/gm);
-    return headers ? headers.map(h => h.replace(/^#+\s+/, '')) : [];
+    return headers ? headers.map(h => h.replaceAll(/^#+\s+/, '')) : [];
   }
 }
 
@@ -384,7 +384,7 @@ Provide:
   }
 
   private extractTestCases(text: string): string[] {
-    const testSection = text.match(/test cases?:?([\s\S]*?)(?=\n\n|\n#|quality|$)/i);
+    const testSection = /test cases?:?([\s\S]*?)(?=\n\n|\n#|quality|$)/i.exec(text);
     if (testSection) {
       return this.extractKeyPoints(testSection[1]);
     }
@@ -392,7 +392,7 @@ Provide:
   }
 
   private extractIssues(text: string): string[] {
-    const issuesSection = text.match(/issues? found:?([\s\S]*?)(?=\n\n|\n#|recommendations|$)/i);
+    const issuesSection = /issues? found:?([\s\S]*?)(?=\n\n|\n#|recommendations|$)/i.exec(text);
     if (issuesSection) {
       return this.extractKeyPoints(issuesSection[1]);
     }
@@ -402,8 +402,8 @@ Provide:
   private extractKeyPoints(text: string): string[] {
     const lines = text.split('\n');
     return lines
-      .filter(line => line.trim().match(/^[-•*]\s+/))
-      .map(line => line.trim().replace(/^[-•*]\s+/, ''));
+      .filter(line => /^[-•*]\s+/.exec(line.trim()))
+      .map(line => line.trim().replaceAll(/^[-•*]\s+/, ''));
   }
 
   private calculateQualityScore(text: string): number {
@@ -455,7 +455,7 @@ Provide:
   }
 
   private extractMilestones(text: string): string[] {
-    const milestoneSection = text.match(/milestones?:?([\s\S]*?)(?=\n\n|\n#|resources|$)/i);
+    const milestoneSection = /milestones?:?([\s\S]*?)(?=\n\n|\n#|resources|$)/i.exec(text);
     if (milestoneSection) {
       return this.extractKeyPoints(milestoneSection[1]);
     }
@@ -463,7 +463,7 @@ Provide:
   }
 
   private extractRisks(text: string): string[] {
-    const riskSection = text.match(/risks?:?([\s\S]*?)(?=\n\n|\n#|success|$)/i);
+    const riskSection = /risks?:?([\s\S]*?)(?=\n\n|\n#|success|$)/i.exec(text);
     if (riskSection) {
       return this.extractKeyPoints(riskSection[1]);
     }
@@ -473,8 +473,8 @@ Provide:
   private extractKeyPoints(text: string): string[] {
     const lines = text.split('\n');
     return lines
-      .filter(line => line.trim().match(/^[-•*]\s+/))
-      .map(line => line.trim().replace(/^[-•*]\s+/, ''));
+      .filter(line => /^[-•*]\s+/.exec(line.trim()))
+      .map(line => line.trim().replaceAll(/^[-•*]\s+/, ''));
   }
 }
 
@@ -523,7 +523,7 @@ Provide:
     const lines = text.split('\n');
 
     for (const line of lines) {
-      const match = line.match(/(.+?):\s*\$?([\d,]+(?:\.\d{2})?)/);
+      const match = /(.+?):\s*\$?([\d,]+(?:\.\d{2})?)/.exec(line);
       if (match) {
         const key = match[1].trim().toLowerCase().replaceAll(/\s+/g, '_');
         const value = Number.parseFloat(match[2].replaceAll(',', ''));
@@ -535,7 +535,7 @@ Provide:
   }
 
   private extractTotalCost(text: string): number {
-    const match = text.match(/total.*?:\s*\$?([\d,]+(?:\.\d{2})?)/i);
+    const match = /total.*?:\s*\$?([\d,]+(?:\.\d{2})?)/i.exec(text);
     if (match) {
       return Number.parseFloat(match[1].replaceAll(',', ''));
     }
@@ -543,7 +543,7 @@ Provide:
   }
 
   private extractAssumptions(text: string): string[] {
-    const assumptionSection = text.match(/assumptions?:?([\s\S]*?)(?=\n\n|\n#|risk|$)/i);
+    const assumptionSection = /assumptions?:?([\s\S]*?)(?=\n\n|\n#|risk|$)/i.exec(text);
     if (assumptionSection) {
       return this.extractKeyPoints(assumptionSection[1]);
     }
@@ -553,8 +553,8 @@ Provide:
   private extractKeyPoints(text: string): string[] {
     const lines = text.split('\n');
     return lines
-      .filter(line => line.trim().match(/^[-•*]\s+/))
-      .map(line => line.trim().replace(/^[-•*]\s+/, ''));
+      .filter(line => /^[-•*]\s+/.exec(line.trim()))
+      .map(line => line.trim().replaceAll(/^[-•*]\s+/, ''));
   }
 }
 
@@ -599,7 +599,7 @@ Provide:
   }
 
   private extractTechStack(text: string): string[] {
-    const techSection = text.match(/technology stack:?([\s\S]*?)(?=\n\n|\n#|system|$)/i);
+    const techSection = /technology stack:?([\s\S]*?)(?=\n\n|\n#|system|$)/i.exec(text);
     if (techSection) {
       return this.extractKeyPoints(techSection[1]);
     }
@@ -607,7 +607,7 @@ Provide:
   }
 
   private extractComponents(text: string): string[] {
-    const componentSection = text.match(/components?:?([\s\S]*?)(?=\n\n|\n#|data|$)/i);
+    const componentSection = /components?:?([\s\S]*?)(?=\n\n|\n#|data|$)/i.exec(text);
     if (componentSection) {
       return this.extractKeyPoints(componentSection[1]);
     }
@@ -617,7 +617,7 @@ Provide:
   private extractKeyPoints(text: string): string[] {
     const lines = text.split('\n');
     return lines
-      .filter(line => line.trim().match(/^[-•*]\s+/))
-      .map(line => line.trim().replace(/^[-•*]\s+/, ''));
+      .filter(line => /^[-•*]\s+/.exec(line.trim()))
+      .map(line => line.trim().replaceAll(/^[-•*]\s+/, ''));
   }
 }

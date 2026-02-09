@@ -15,12 +15,12 @@ import {
 import { JobQueue } from '../queue/JobQueue';
 
 export class JobProcessor {
-  private queue: JobQueue;
-  private processors: Map<string, JobProcessorFn> = new Map();
+  private readonly queue: JobQueue;
+  private readonly processors: Map<string, JobProcessorFn> = new Map();
   private processingLoop: NodeJS.Timeout | null = null;
   private isRunning: boolean = false;
-  private eventListeners: Map<JobEventType, Array<(event: JobEvent) => void>> = new Map();
-  private cancellationSignals: Map<string, boolean> = new Map();
+  private readonly eventListeners: Map<JobEventType, Array<(event: JobEvent) => void>> = new Map();
+  private readonly cancellationSignals: Map<string, boolean> = new Map();
 
   constructor(queue: JobQueue) {
     this.queue = queue;

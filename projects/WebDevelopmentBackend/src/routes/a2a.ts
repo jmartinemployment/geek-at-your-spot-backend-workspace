@@ -11,7 +11,7 @@ router.post('/execute', async (req: Request, res: Response) => {
   try {
     const a2aService = req.app.locals.a2aService as A2AService;
 
-    if (!a2aService || !a2aService.isEnabled()) {
+    if (!a2aService?.isEnabled()) {
       return res.status(400).json({
         error: 'A2A service is not available',
       });

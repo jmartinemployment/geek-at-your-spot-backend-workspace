@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "nodemon --exec ts-node src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "lint": "eslint --config ../../eslint.config.mjs src",
+    "lint:fix": "eslint --config ../../eslint.config.mjs src --fix"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",
@@ -29,6 +31,8 @@
     "uuid": "^13.0.0"
   },
   "devDependencies": {
-    "@types/uuid": "^10.0.0"
+    "@types/uuid": "^10.0.0",
+    "eslint": "^9.18.0",
+    "typescript-eslint": "^8.23.0"
   }
 }
