@@ -25,7 +25,9 @@ const port = process.env.PORT || 3000;
 const prisma = new PrismaClient();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: (process.env.CORS_ORIGIN ?? 'https://geekatyourspot.com,https://www.geekatyourspot.com,http://localhost:4200').split(','),
+}));
 app.use(express.json());
 
 // ============================================

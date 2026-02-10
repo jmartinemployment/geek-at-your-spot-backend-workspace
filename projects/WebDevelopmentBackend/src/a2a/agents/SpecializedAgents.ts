@@ -302,9 +302,12 @@ Provide:
     const lines = text.split('\n');
 
     for (const line of lines) {
-      const match = /([^:]+):\s*(\d[\d.]*%?)/.exec(line);
-      if (match) {
-        metrics[match[1].toLowerCase().replaceAll(/\s+/g, '_')] = match[2];
+      const colonIdx = line.indexOf(':');
+      if (colonIdx === -1) continue;
+      const key = line.substring(0, colonIdx).trim();
+      const value = line.substring(colonIdx + 1).trim();
+      if (key && /^\d[\d.]*%?$/.test(value)) {
+        metrics[key.toLowerCase().replaceAll(/\s+/g, '_')] = value;
       }
     }
 
@@ -531,11 +534,14 @@ Provide:
     const lines = text.split('\n');
 
     for (const line of lines) {
-      const match = /([^:]+):\s*\$?([\d,]+(?:\.\d{2})?)/.exec(line);
-      if (match) {
-        const key = match[1].trim().toLowerCase().replaceAll(/\s+/g, '_');
-        const value = Number.parseFloat(match[2].replaceAll(',', ''));
-        breakdown[key] = value;
+      const colonIdx = line.indexOf(':');
+      if (colonIdx === -1) continue;
+      const rawKey = line.substring(0, colonIdx).trim();
+      const rawValue = line.substring(colonIdx + 1).trim().replace(/^\$/, '');
+      const numericValue = Number.parseFloat(rawValue.replaceAll(',', ''));
+      if (rawKey && !Number.isNaN(numericValue)) {
+        const key = rawKey.toLowerCase().replaceAll(/\s+/g, '_');
+        breakdown[key] = numericValue;
       }
     }
 

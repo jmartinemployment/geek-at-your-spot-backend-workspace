@@ -12,7 +12,9 @@ const app = express();
 app.disable('x-powered-by');
 const port = process.env.PORT || 4000;
 
-app.use(cors());
+app.use(cors({
+  origin: (process.env.CORS_ORIGIN ?? 'https://geekatyourspot.com,https://www.geekatyourspot.com,http://localhost:4200').split(','),
+}));
 app.use(express.json());
 
 const WEB_DEV_BACKEND_URL = process.env.WEB_DEV_BACKEND_URL || 'http://localhost:3000';

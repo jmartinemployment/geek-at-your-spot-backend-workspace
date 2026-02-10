@@ -12,7 +12,9 @@ const app = express();
 app.disable('x-powered-by');
 const port = process.env.PORT || 5003;
 
-app.use(cors());
+app.use(cors({
+  origin: (process.env.CORS_ORIGIN ?? 'https://geekatyourspot.com,https://www.geekatyourspot.com,http://localhost:4200').split(','),
+}));
 app.use(express.json());
 
 const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY || '';
